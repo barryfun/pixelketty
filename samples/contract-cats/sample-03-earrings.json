@@ -1,0 +1,27 @@
+{
+  "name": "Mega Cat #3",
+  "description": "A fully on-chain CAT NFT generated when a wallet holds MEGA. Selling the full memecoin balance burns it; rebuying creates a new random cat.",
+  "image": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBzaGFwZS1yZW5kZXJpbmc9ImNyaXNwRWRnZXMiPjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiBmaWxsPSIjZjZkMzY1Ii8+PHJlY3QgeD0iMzIiIHk9IjMyIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4xOCIvPjxyZWN0IHg9IjQxNiIgeT0iMzg0IiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIGZpbGw9IiMxMTEiIG9wYWNpdHk9Ii4xMiIvPjxyZWN0IHg9IjE0NCIgeT0iMTI4IiB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIGZpbGw9IiM4ZDZlNjMiLz48cmVjdCB4PSIzMjAiIHk9IjEyOCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiBmaWxsPSIjOGQ2ZTYzIi8+PHJlY3QgeD0iMTEyIiB5PSIxNzYiIHdpZHRoPSIyODgiIGhlaWdodD0iMjI0IiBmaWxsPSIjMTExIi8+PHJlY3QgeD0iMTI4IiB5PSIxNzYiIHdpZHRoPSIyNTYiIGhlaWdodD0iMjA4IiBmaWxsPSIjOGQ2ZTYzIi8+PHJlY3QgeD0iMTYwIiB5PSIxNjAiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iI2ZmZDljOSIvPjxyZWN0IHg9IjMyMCIgeT0iMTYwIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiNmZmQ5YzkiLz48cmVjdCB4PSIxNjAiIHk9IjM1MiIgd2lkdGg9IjE5MiIgaGVpZ2h0PSI4MCIgZmlsbD0iIzExMSIvPjxyZWN0IHg9IjE3NiIgeT0iMzUyIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjY0IiBmaWxsPSIjMmE5ZDhmIi8+PHJlY3QgeD0iMTkyIiB5PSIyNzIiIHdpZHRoPSI0MCIgaGVpZ2h0PSIxNiIgZmlsbD0iIzExMSIvPjxyZWN0IHg9IjI4MCIgeT0iMjcyIiB3aWR0aD0iNDAiIGhlaWdodD0iMTYiIGZpbGw9IiMxMTEiLz48cmVjdCB4PSIyNDAiIHk9IjI4OCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjE2IiBmaWxsPSIjMTExIi8+PHJlY3QgeD0iMjI0IiB5PSIzMjgiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iIzExMSIvPjxyZWN0IHg9IjI0MCIgeT0iMzQ0IiB3aWR0aD0iMzIiIGhlaWdodD0iMTYiIGZpbGw9IiMxMTEiLz48cmVjdCB4PSIyNzIiIHk9IjMyOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBmaWxsPSIjMTExIi8+PHJlY3QgeD0iMTc2IiB5PSIxMjgiIHdpZHRoPSIxNjAiIGhlaWdodD0iMzIiIGZpbGw9IiMxMTEiLz48cmVjdCB4PSIxOTIiIHk9IjExMiIgd2lkdGg9IjEyOCIgaGVpZ2h0PSI0MCIgZmlsbD0iIzRlY2RjNCIvPjxyZWN0IHg9IjE2MCIgeT0iMTUyIiB3aWR0aD0iMTkyIiBoZWlnaHQ9IjI0IiBmaWxsPSIjMTExIi8+PHJlY3QgeD0iMTI4IiB5PSIzMDQiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iIzExMSIvPjxyZWN0IHg9IjEzNiIgeT0iMzEyIiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIGZpbGw9IiNmZmQ0NDciLz48cmVjdCB4PSIzNTIiIHk9IjMwNCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjMTExIi8+PHJlY3QgeD0iMzYwIiB5PSIzMTIiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iI2ZmZDQ0NyIvPjx0ZXh0IHg9IjI4IiB5PSI1NCIgZmlsbD0iIzExMSIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9IjkwMCI+TUVHQSBDQVQgIzM8L3RleHQ+PHRleHQgeD0iMjgiIHk9IjQ4NiIgZmlsbD0iIzExMSIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIxOCIgZm9udC13ZWlnaHQ9IjkwMCI+NTAwMCBNRUdBIFBPV0VSPC90ZXh0Pjwvc3ZnPg==",
+  "attributes": [
+    {
+      "trait_type": "Fur",
+      "value": "Mocha"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Sunrise"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sleepy"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Teal Jacket"
+    },
+    {
+      "trait_type": "Accessory Level",
+      "value": "2"
+    }
+  ]
+}

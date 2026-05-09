@@ -1,0 +1,137 @@
+[
+  {
+    "name": "Mega Cat #1",
+    "file": "/Users/barry/Documents/Codex/2026-05-02/web-3-project/samples/contract-cats/sample-01-basic.svg",
+    "amount": 250,
+    "traits": [
+      {
+        "trait_type": "Fur",
+        "value": "Silver"
+      },
+      {
+        "trait_type": "Background",
+        "value": "Sky"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cyber"
+      },
+      {
+        "trait_type": "Outfit",
+        "value": "Black Hoodie"
+      },
+      {
+        "trait_type": "Accessory Level",
+        "value": "0"
+      }
+    ]
+  },
+  {
+    "name": "Mega Cat #2",
+    "file": "/Users/barry/Documents/Codex/2026-05-02/web-3-project/samples/contract-cats/sample-02-head-accessory.svg",
+    "amount": 1000,
+    "traits": [
+      {
+        "trait_type": "Fur",
+        "value": "Silver"
+      },
+      {
+        "trait_type": "Background",
+        "value": "Mint"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Cyber"
+      },
+      {
+        "trait_type": "Outfit",
+        "value": "Navy Suit"
+      },
+      {
+        "trait_type": "Accessory Level",
+        "value": "1"
+      }
+    ]
+  },
+  {
+    "name": "Mega Cat #3",
+    "file": "/Users/barry/Documents/Codex/2026-05-02/web-3-project/samples/contract-cats/sample-03-earrings.svg",
+    "amount": 5000,
+    "traits": [
+      {
+        "trait_type": "Fur",
+        "value": "Mocha"
+      },
+      {
+        "trait_type": "Background",
+        "value": "Sunrise"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Sleepy"
+      },
+      {
+        "trait_type": "Outfit",
+        "value": "Teal Jacket"
+      },
+      {
+        "trait_type": "Accessory Level",
+        "value": "2"
+      }
+    ]
+  },
+  {
+    "name": "Mega Cat #4",
+    "file": "/Users/barry/Documents/Codex/2026-05-02/web-3-project/samples/contract-cats/sample-04-visor.svg",
+    "amount": 10000,
+    "traits": [
+      {
+        "trait_type": "Fur",
+        "value": "Pink"
+      },
+      {
+        "trait_type": "Background",
+        "value": "Aqua"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Happy"
+      },
+      {
+        "trait_type": "Outfit",
+        "value": "Red Tee"
+      },
+      {
+        "trait_type": "Accessory Level",
+        "value": "3"
+      }
+    ]
+  },
+  {
+    "name": "Mega Cat #5",
+    "file": "/Users/barry/Documents/Codex/2026-05-02/web-3-project/samples/contract-cats/sample-05-max-accessories.svg",
+    "amount": 25000,
+    "traits": [
+      {
+        "trait_type": "Fur",
+        "value": "Orange"
+      },
+      {
+        "trait_type": "Background",
+        "value": "Bubblegum"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Sleepy"
+      },
+      {
+        "trait_type": "Outfit",
+        "value": "Black Hoodie"
+      },
+      {
+        "trait_type": "Accessory Level",
+        "value": "4"
+      }
+    ]
+  }
+]
