@@ -1,0 +1,27 @@
+{
+  "name": "Mega Cat #2",
+  "description": "A fully on-chain CAT NFT generated when a wallet holds MEGA. Selling the full memecoin balance burns it; rebuying creates a new random cat.",
+  "image": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBzaGFwZS1yZW5kZXJpbmc9ImNyaXNwRWRnZXMiPjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiBmaWxsPSIjYjhmMmU2Ii8+PHJlY3QgeD0iMzIiIHk9IjMyIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4xOCIvPjxyZWN0IHg9IjQxNiIgeT0iMzg0IiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIGZpbGw9IiMxMTEiIG9wYWNpdHk9Ii4xMiIvPjxyZWN0IHg9IjE0NCIgeT0iMTI4IiB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIGZpbGw9IiNiZmMwYzAiLz48cmVjdCB4PSIzMjAiIHk9IjEyOCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiBmaWxsPSIjYmZjMGMwIi8+PHJlY3QgeD0iMTEyIiB5PSIxNzYiIHdpZHRoPSIyODgiIGhlaWdodD0iMjI0IiBmaWxsPSIjMTExIi8+PHJlY3QgeD0iMTI4IiB5PSIxNzYiIHdpZHRoPSIyNTYiIGhlaWdodD0iMjA4IiBmaWxsPSIjYmZjMGMwIi8+PHJlY3QgeD0iMTYwIiB5PSIxNjAiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iI2ZmZDljOSIvPjxyZWN0IHg9IjMyMCIgeT0iMTYwIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiNmZmQ5YzkiLz48cmVjdCB4PSIxNjAiIHk9IjM1MiIgd2lkdGg9IjE5MiIgaGVpZ2h0PSI4MCIgZmlsbD0iIzExMSIvPjxyZWN0IHg9IjE3NiIgeT0iMzUyIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjY0IiBmaWxsPSIjMjY0NjUzIi8+PHJlY3QgeD0iMTg0IiB5PSIyNDgiIHdpZHRoPSI0OCIgaGVpZ2h0PSI0MCIgZmlsbD0iIzExMSIvPjxyZWN0IHg9IjI4MCIgeT0iMjQ4IiB3aWR0aD0iNDgiIGhlaWdodD0iNDAiIGZpbGw9IiMxMTEiLz48cmVjdCB4PSIxOTIiIHk9IjI1NiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjE2IiBmaWxsPSIjNDhmMGZmIi8+PHJlY3QgeD0iMjg4IiB5PSIyNTYiIHdpZHRoPSIzMiIgaGVpZ2h0PSIxNiIgZmlsbD0iIzQ4ZjBmZiIvPjxyZWN0IHg9IjI0MCIgeT0iMjg4IiB3aWR0aD0iMzIiIGhlaWdodD0iMTYiIGZpbGw9IiMxMTEiLz48cmVjdCB4PSIyMjQiIHk9IjMyOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBmaWxsPSIjMTExIi8+PHJlY3QgeD0iMjQwIiB5PSIzNDQiIHdpZHRoPSIzMiIgaGVpZ2h0PSIxNiIgZmlsbD0iIzExMSIvPjxyZWN0IHg9IjI3MiIgeT0iMzI4IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIGZpbGw9IiMxMTEiLz48cmVjdCB4PSIxOTIiIHk9IjExMiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjQ4IiBmaWxsPSIjZmZkNDQ3Ii8+PHJlY3QgeD0iMjQwIiB5PSI5NiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjY0IiBmaWxsPSIjZmZkNDQ3Ii8+PHJlY3QgeD0iMjg4IiB5PSIxMTIiIHdpZHRoPSIzMiIgaGVpZ2h0PSI0OCIgZmlsbD0iI2ZmZDQ0NyIvPjxyZWN0IHg9IjE3NiIgeT0iMTUyIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjI0IiBmaWxsPSIjMTExIi8+PHJlY3QgeD0iMTkyIiB5PSIxNTIiIHdpZHRoPSIxMjgiIGhlaWdodD0iMTYiIGZpbGw9IiNmZmQ0NDciLz48dGV4dCB4PSIyOCIgeT0iNTQiIGZpbGw9IiMxMTEiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSI5MDAiPk1FR0EgQ0FUICMyPC90ZXh0Pjx0ZXh0IHg9IjI4IiB5PSI0ODYiIGZpbGw9IiMxMTEiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSI5MDAiPjEwMDAgTUVHQSBQT1dFUjwvdGV4dD48L3N2Zz4=",
+  "attributes": [
+    {
+      "trait_type": "Fur",
+      "value": "Silver"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Mint"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Cyber"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Navy Suit"
+    },
+    {
+      "trait_type": "Accessory Level",
+      "value": "1"
+    }
+  ]
+}
