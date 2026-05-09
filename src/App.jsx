@@ -37,6 +37,7 @@ const pricePerToken = 0.001;
 const pricePerTokenWei = ethers.parseEther("0.001");
 const nftCostWei = ethers.parseEther("10");
 const dynamicPreviewCostWei = ethers.parseEther("60");
+const saleSupplyWei = ethers.parseEther("50000");
 const shortAddress = (address) => `${address.slice(0, 6)}...${address.slice(-4)}`;
 const formatToken = (value) => Number(ethers.formatEther(value || 0n)).toLocaleString(undefined, { maximumFractionDigits: 4 });
 const formatEth = (value) => Number(ethers.formatEther(value || 0n)).toLocaleString(undefined, { maximumFractionDigits: 5 });
@@ -45,6 +46,34 @@ const accessoryTraits = ["Crown Rank", "Earrings Rank", "Visor Rank", "Star Rank
 const configuredDexScreenerUrl = (import.meta.env.VITE_DEXSCREENER_URL || "").trim();
 const dexScreenerFallbackUrl = "https://dexscreener.com/ethereum";
 const targetChain = chains[megaMeme.chainId] || chains[31337];
+const svgToImage = (svg) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+
+const showcaseCats = [
+  {
+    name: "KETTY Rain Hoodie",
+    image: svgToImage(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="crispEdges"><style>@keyframes rain{from{transform:translateY(-80px)}to{transform:translateY(120px)}}.rain{animation:rain 1.8s linear infinite}</style><rect width="512" height="512" fill="#1f2b31"/><g class="rain" fill="#8fd6ff"><rect x="82" y="20" width="8" height="28"/><rect x="170" y="70" width="8" height="28"/><rect x="318" y="24" width="8" height="28"/><rect x="426" y="88" width="8" height="28"/><rect x="120" y="222" width="8" height="28"/><rect x="366" y="220" width="8" height="28"/></g><rect x="122" y="332" width="268" height="78" fill="#40524b" stroke="#0d1010" stroke-width="16"/><rect x="148" y="134" width="76" height="88" fill="#bfc7c4" stroke="#0d1010" stroke-width="14"/><rect x="288" y="134" width="76" height="88" fill="#bfc7c4" stroke="#0d1010" stroke-width="14"/><rect x="118" y="190" width="276" height="188" fill="#c9d0cd" stroke="#0d1010" stroke-width="16"/><rect x="188" y="238" width="136" height="118" fill="#f0e3d2"/><rect x="184" y="244" width="28" height="48" fill="#0d1010"/><rect x="300" y="244" width="28" height="48" fill="#0d1010"/><rect x="244" y="290" width="24" height="24" fill="#0d1010"/><rect x="220" y="318" width="72" height="18" fill="#0d1010"/><rect x="104" y="360" width="304" height="70" fill="#586b61" stroke="#0d1010" stroke-width="14"/><rect x="166" y="108" width="180" height="34" fill="#5b6f65" stroke="#0d1010" stroke-width="12"/><text x="34" y="52" fill="#ffffff" font-family="monospace" font-size="22" font-weight="900">KETTY CAT</text></svg>`)
+  },
+  {
+    name: "KETTY Thunder Crown",
+    image: svgToImage(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="crispEdges"><style>@keyframes flash{0%,80%,100%{opacity:.2}84%{opacity:1}}.flash{animation:flash 2.4s steps(1) infinite}</style><rect width="512" height="512" fill="#171a29"/><rect class="flash" width="512" height="512" fill="#fff2a8"/><path d="M368 42h42l-40 90h46l-86 138 28-100h-42z" fill="#ffd447"/><rect x="104" y="338" width="304" height="74" fill="#392f55" stroke="#0b0c10" stroke-width="16"/><rect x="144" y="136" width="78" height="92" fill="#d3d3d0" stroke="#0b0c10" stroke-width="14"/><rect x="290" y="136" width="78" height="92" fill="#d3d3d0" stroke="#0b0c10" stroke-width="14"/><rect x="116" y="194" width="280" height="190" fill="#d8d8d2" stroke="#0b0c10" stroke-width="16"/><rect x="188" y="244" width="136" height="118" fill="#efe3cf"/><rect x="184" y="244" width="28" height="48" fill="#0b0c10"/><rect x="300" y="244" width="28" height="48" fill="#0b0c10"/><rect x="244" y="292" width="24" height="22" fill="#0b0c10"/><rect x="214" y="322" width="84" height="18" fill="#0b0c10"/><rect x="180" y="108" width="42" height="34" fill="#f7c531" stroke="#0b0c10" stroke-width="10"/><rect x="236" y="82" width="42" height="60" fill="#f7c531" stroke="#0b0c10" stroke-width="10"/><rect x="292" y="108" width="42" height="34" fill="#f7c531" stroke="#0b0c10" stroke-width="10"/><text x="34" y="52" fill="#ffffff" font-family="monospace" font-size="22" font-weight="900">RARE ROLL</text></svg>`)
+  },
+  {
+    name: "KETTY Neon Visor",
+    image: svgToImage(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="crispEdges"><style>@keyframes pulse{50%{opacity:.35}}.pulse{animation:pulse 1.6s ease-in-out infinite}</style><rect width="512" height="512" fill="#161f1c"/><rect class="pulse" x="0" y="0" width="512" height="512" fill="#6effc4"/><rect x="42" y="78" width="72" height="72" fill="#25352e"/><rect x="398" y="62" width="58" height="58" fill="#25352e"/><rect x="88" y="346" width="336" height="76" fill="#303a35" stroke="#0c0f0e" stroke-width="16"/><rect x="144" y="136" width="78" height="90" fill="#b8c0bd" stroke="#0c0f0e" stroke-width="14"/><rect x="290" y="136" width="78" height="90" fill="#b8c0bd" stroke="#0c0f0e" stroke-width="14"/><rect x="116" y="194" width="280" height="190" fill="#c4ccc8" stroke="#0c0f0e" stroke-width="16"/><rect x="188" y="244" width="136" height="118" fill="#eadfcf"/><rect x="168" y="238" width="176" height="42" fill="#0c0f0e"/><rect x="184" y="248" width="144" height="14" fill="#75ffdc"/><rect x="244" y="292" width="24" height="22" fill="#0c0f0e"/><rect x="214" y="324" width="84" height="18" fill="#0c0f0e"/><rect x="128" y="354" width="256" height="76" fill="#1f3c37" stroke="#0c0f0e" stroke-width="14"/><text x="34" y="52" fill="#ffffff" font-family="monospace" font-size="22" font-weight="900">VISOR MODE</text></svg>`)
+  },
+  {
+    name: "KETTY Star Collar",
+    image: svgToImage(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="crispEdges"><style>@keyframes drift{from{transform:translateX(-30px)}to{transform:translateX(30px)}}.cloud{animation:drift 4s ease-in-out infinite alternate}</style><rect width="512" height="512" fill="#d9cbb2"/><g class="cloud" fill="#f7f2e6"><rect x="56" y="78" width="92" height="28"/><rect x="320" y="104" width="110" height="28"/><rect x="160" y="52" width="78" height="28"/></g><rect x="100" y="342" width="312" height="72" fill="#5f4a3c" stroke="#0f0d0c" stroke-width="16"/><rect x="148" y="136" width="76" height="90" fill="#b9b2aa" stroke="#0f0d0c" stroke-width="14"/><rect x="288" y="136" width="76" height="90" fill="#b9b2aa" stroke="#0f0d0c" stroke-width="14"/><rect x="118" y="194" width="276" height="190" fill="#c8c0b5" stroke="#0f0d0c" stroke-width="16"/><rect x="188" y="244" width="136" height="118" fill="#efe1ce"/><rect x="184" y="244" width="28" height="48" fill="#0f0d0c"/><rect x="300" y="244" width="28" height="48" fill="#0f0d0c"/><rect x="244" y="292" width="24" height="22" fill="#0f0d0c"/><rect x="214" y="322" width="84" height="18" fill="#0f0d0c"/><rect x="188" y="354" width="136" height="28" fill="#a93422" stroke="#0f0d0c" stroke-width="10"/><path d="M256 338l14 26h30l-24 18 10 28-30-18-30 18 10-28-24-18h30z" fill="#ffd447" stroke="#0f0d0c" stroke-width="8"/><text x="34" y="52" fill="#141414" font-family="monospace" font-size="22" font-weight="900">COLLAR RANK</text></svg>`)
+  },
+  {
+    name: "KETTY Aurora Jacket",
+    image: svgToImage(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="crispEdges"><style>@keyframes aurora{50%{transform:translateY(22px);opacity:.65}}.a{animation:aurora 2.8s ease-in-out infinite alternate}</style><rect width="512" height="512" fill="#111820"/><path class="a" d="M0 108h512v88c-96-52-170 62-256 20C164 172 94 94 0 146z" fill="#64ffd2"/><path class="a" d="M0 170h512v86c-112-36-150 66-256 26C158 246 88 164 0 224z" fill="#7f8cff" opacity=".8"/><rect x="96" y="338" width="320" height="76" fill="#26364e" stroke="#090b0e" stroke-width="16"/><rect x="144" y="136" width="78" height="90" fill="#ccd4d1" stroke="#090b0e" stroke-width="14"/><rect x="290" y="136" width="78" height="90" fill="#ccd4d1" stroke="#090b0e" stroke-width="14"/><rect x="116" y="194" width="280" height="190" fill="#d4dcda" stroke="#090b0e" stroke-width="16"/><rect x="188" y="244" width="136" height="118" fill="#efe2d0"/><rect x="184" y="244" width="28" height="48" fill="#090b0e"/><rect x="300" y="244" width="28" height="48" fill="#090b0e"/><rect x="244" y="292" width="24" height="22" fill="#090b0e"/><rect x="214" y="322" width="84" height="18" fill="#090b0e"/><rect x="126" y="352" width="260" height="78" fill="#2d4b68" stroke="#090b0e" stroke-width="14"/><rect x="182" y="116" width="148" height="26" fill="#b884ff" stroke="#090b0e" stroke-width="10"/><text x="34" y="52" fill="#ffffff" font-family="monospace" font-size="22" font-weight="900">AURORA DROP</text></svg>`)
+  },
+  {
+    name: "KETTY Meteor Glasses",
+    image: svgToImage(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="crispEdges"><style>@keyframes meteor{from{transform:translate(140px,-120px)}to{transform:translate(-160px,180px)}}.m{animation:meteor 1.9s linear infinite}</style><rect width="512" height="512" fill="#191515"/><rect x="60" y="90" width="12" height="12" fill="#ffffff"/><rect x="260" y="54" width="12" height="12" fill="#ffffff"/><rect x="430" y="132" width="12" height="12" fill="#ffffff"/><g class="m"><rect x="330" y="52" width="86" height="14" fill="#ffdd72"/><rect x="402" y="52" width="28" height="14" fill="#ff7048"/></g><rect x="98" y="340" width="316" height="76" fill="#3d3430" stroke="#0b0908" stroke-width="16"/><rect x="146" y="136" width="76" height="90" fill="#bfc3c0" stroke="#0b0908" stroke-width="14"/><rect x="290" y="136" width="76" height="90" fill="#bfc3c0" stroke="#0b0908" stroke-width="14"/><rect x="118" y="194" width="276" height="190" fill="#cbd0cd" stroke="#0b0908" stroke-width="16"/><rect x="188" y="244" width="136" height="118" fill="#efe2d0"/><rect x="166" y="238" width="68" height="50" fill="#0b0908"/><rect x="278" y="238" width="68" height="50" fill="#0b0908"/><rect x="228" y="254" width="56" height="12" fill="#0b0908"/><rect x="180" y="252" width="40" height="16" fill="#ffdd72"/><rect x="292" y="252" width="40" height="16" fill="#ffdd72"/><rect x="244" y="292" width="24" height="22" fill="#0b0908"/><rect x="214" y="322" width="84" height="18" fill="#0b0908"/><text x="34" y="52" fill="#ffffff" font-family="monospace" font-size="22" font-weight="900">METEOR CAT</text></svg>`)
+  }
+];
 
 const emptyState = {
   ethBalance: 0n,
@@ -59,7 +88,7 @@ const emptyState = {
   nftTraits: [],
   ownedNfts: [],
   marketListings: [],
-  remainingForSale: 0n,
+  remainingForSale: saleSupplyWei,
   liquidityEthSeeded: 0n,
   liquidityTokenSeeded: 0n,
   liquiditySeeded: false,
@@ -600,11 +629,7 @@ export function App() {
 
       <section className="hero">
         <div className="hero-art" aria-hidden="true">
-          {state.nftActive && state.nftImage ? (
-            <img className="nft-preview" src={state.nftImage} alt={state.nftName || "KETTY Cat NFT"} />
-          ) : (
-            <PixelCatPlaceholder />
-          )}
+          <RotatingKettyPreview />
         </div>
 
         <div className="hero-copy">
@@ -1068,6 +1093,24 @@ function RankList({ ranks }) {
       ))}
     </div>
   );
+}
+
+function RotatingKettyPreview() {
+  const [catIndex, setCatIndex] = useState(() => Math.floor(Math.random() * showcaseCats.length));
+  const cat = showcaseCats[catIndex];
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setCatIndex((currentIndex) => {
+        const nextIndex = Math.floor(Math.random() * showcaseCats.length);
+        return nextIndex === currentIndex ? (nextIndex + 1) % showcaseCats.length : nextIndex;
+      });
+    }, 10000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return <img key={cat.name} className="showcase-preview" src={cat.image} alt={`${cat.name} preview`} />;
 }
 
 function PixelCatPlaceholder() {

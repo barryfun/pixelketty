@@ -166,6 +166,7 @@ a.icon-button {
 }
 
 .nft-preview,
+.showcase-preview,
 .pixel-placeholder {
   aspect-ratio: 1;
   border: 1px solid #141414;
@@ -174,6 +175,25 @@ a.icon-button {
   max-width: 380px;
   object-fit: cover;
   width: 78%;
+}
+
+.showcase-preview {
+  animation: showcaseSwap 900ms ease both;
+  background: #141414;
+}
+
+@keyframes showcaseSwap {
+  from {
+    filter: blur(5px);
+    opacity: 0;
+    transform: scale(0.975);
+  }
+
+  to {
+    filter: blur(0);
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .pixel-placeholder {
@@ -492,7 +512,7 @@ h3 {
 .button-stack {
   display: grid;
   gap: 10px;
-  margin-top: auto;
+  margin-top: 4px;
 }
 
 .segmented {
