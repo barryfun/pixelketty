@@ -4,3 +4,5 @@ artifacts
 cache
 .env
 .DS_Store
+pixelketty-github-upload.zip
+pixelketty-github-upload/
