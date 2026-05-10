@@ -57,6 +57,12 @@ const dexScreenerFallbackUrl = "https://dexscreener.com/ethereum";
 const targetChain = chains[megaMeme.chainId] || chains[31337];
 const svgToImage = (svg) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 const fallbackMarketImage = svgToImage(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="crispEdges"><rect width="512" height="512" fill="#202624"/><rect x="116" y="190" width="280" height="190" fill="#c9d0cd" stroke="#0d1010" stroke-width="16"/><rect x="148" y="134" width="76" height="88" fill="#bfc7c4" stroke="#0d1010" stroke-width="14"/><rect x="288" y="134" width="76" height="88" fill="#bfc7c4" stroke="#0d1010" stroke-width="14"/><rect x="188" y="244" width="136" height="118" fill="#f0e3d2"/><rect x="184" y="244" width="28" height="48" fill="#0d1010"/><rect x="300" y="244" width="28" height="48" fill="#0d1010"/><rect x="244" y="292" width="24" height="22" fill="#0d1010"/><rect x="214" y="322" width="84" height="18" fill="#0d1010"/><text x="34" y="52" fill="#fff" font-family="monospace" font-size="22" font-weight="900">KETTY LISTING</text><text x="34" y="456" fill="#fff" font-family="monospace" font-size="18" font-weight="900">METADATA LOADING</text></svg>`);
+const getInjectedProvider = () => new ethers.BrowserProvider(window.ethereum, "any");
+const formatNetworkName = (network) => {
+  const configured = chains[Number(network.chainId)];
+  if (configured) return configured.chainName;
+  return network.name === "unknown" ? `Chain ${network.chainId}` : network.name;
+};
 
 const showcaseCats = [
   {
@@ -165,8 +171,11 @@ export function App() {
         setState(emptyState);
       }
     };
-    const handleChainChanged = () => {
-      refreshState(account);
+    const handleChainChanged = (hexChainId) => {
+      const nextChainId = Number.parseInt(hexChainId, 16);
+      setChainId(nextChainId);
+      setNetwork(chains[nextChainId]?.chainName || `Chain ${nextChainId}`);
+      window.setTimeout(() => refreshState(account), 150);
     };
 
     window.ethereum.on?.("accountsChanged", handleAccounts);
@@ -209,7 +218,7 @@ export function App() {
     if (!window.ethereum) throw new Error("Install MetaMask or another EIP-1193 wallet first.");
     if (!hasContracts) throw new Error("Run a deploy script first so the frontend has contract addresses.");
 
-    const provider = new ethers.BrowserProvider(window.ethereum);
+    const provider = getInjectedProvider();
     const activeNetwork = await provider.getNetwork();
     if (megaMeme.chainId && Number(activeNetwork.chainId) !== megaMeme.chainId) {
       throw new Error(`Switch wallet network to ${targetChain.chainName} before using KETTY contracts.`);
@@ -228,12 +237,12 @@ export function App() {
   async function connectWallet() {
     try {
       if (!window.ethereum) throw new Error("Install MetaMask or another EIP-1193 wallet first.");
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = getInjectedProvider();
       const accounts = await provider.send("eth_requestAccounts", []);
       const activeNetwork = await provider.getNetwork();
       setAccount(accounts[0]);
       setChainId(Number(activeNetwork.chainId));
-      setNetwork(activeNetwork.name === "unknown" ? `Chain ${activeNetwork.chainId}` : activeNetwork.name);
+      setNetwork(formatNetworkName(activeNetwork));
       setStatus("Wallet connected. Buy KETTY, mint NFTs, upgrade accessories, or trade in the market.");
       await refreshState(accounts[0]);
     } catch (error) {
@@ -250,6 +259,7 @@ export function App() {
         params: [{ chainId: targetChain.chainId }]
       });
       setStatus(`Switched to ${targetChain.chainName}.`);
+      window.setTimeout(() => refreshState(account), 150);
     } catch (error) {
       if (error.code === 4902) {
         await window.ethereum.request({
@@ -357,7 +367,7 @@ export function App() {
         return;
       }
 
-      const walletProvider = new ethers.BrowserProvider(window.ethereum);
+      const walletProvider = getInjectedProvider();
       const walletAccounts = await walletProvider.send("eth_accounts", []);
       const activeAccount = walletAccounts[0] || nextAccount;
 
@@ -375,7 +385,7 @@ export function App() {
 
       const walletNetwork = await walletProvider.getNetwork();
       setChainId(Number(walletNetwork.chainId));
-      setNetwork(walletNetwork.name === "unknown" ? `Chain ${walletNetwork.chainId}` : walletNetwork.name);
+      setNetwork(formatNetworkName(walletNetwork));
       if (megaMeme.chainId && Number(walletNetwork.chainId) !== megaMeme.chainId) {
         const marketListings = await loadMarketListings();
         setState({ ...emptyState, marketListings, lastUpdated: Date.now() });
