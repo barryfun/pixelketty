@@ -50,6 +50,14 @@ const shortAddress = (address) => `${address.slice(0, 6)}...${address.slice(-4)}
 const formatToken = (value) => Number(ethers.formatEther(value || 0n)).toLocaleString(undefined, { maximumFractionDigits: 4 });
 const formatEth = (value) => Number(ethers.formatEther(value || 0n)).toLocaleString(undefined, { maximumFractionDigits: 5 });
 const formatEthQuote = (value) => Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: 6 });
+const formatUtcTime = (timestamp) => new Date(timestamp).toLocaleTimeString("en-US", {
+  hour: "numeric",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: true,
+  timeZone: "UTC",
+  timeZoneName: "short"
+});
 const decodeTokenUri = (uri) => JSON.parse(atob(uri.replace("data:application/json;base64,", "")));
 const accessoryTraits = ["Crown Rank", "Earrings Rank", "Visor Rank", "Star Rank", "Collar Rank"];
 const configuredDexScreenerUrl = (import.meta.env.VITE_DEXSCREENER_URL || "").trim();
@@ -1234,7 +1242,7 @@ function LiveState({ state, account, network, chainId }) {
         <Metric label="Holder tax pool" value={`${formatEth(state.taxEthToHolders)} ETH`} />
         <Metric label="Dynamic minted" value={`${state.dynamicMinted.toString()} / 50`} />
         <Metric label="Dynamic left" value={state.dynamicRemaining.toString()} />
-        <Metric label="Last synced" value={state.lastUpdated ? new Date(state.lastUpdated).toLocaleTimeString() : "Waiting"} />
+        <Metric label="Last synced" value={state.lastUpdated ? formatUtcTime(state.lastUpdated) : "Waiting"} />
       </div>
       {state.nftActive && <RankList ranks={state.nftTraits.filter((trait) => accessoryTraits.includes(trait.trait_type))} />}
       <div className={`nft-status ${state.nftActive ? "on" : "off"}`}>
