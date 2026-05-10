@@ -189,9 +189,11 @@ export function App() {
   }, [account, hasContracts, selectedTokenId]);
 
   useEffect(() => {
-    if (activeTab === "market" && account && hasContracts && window.ethereum) {
-      refreshState(account);
-    }
+    if (activeTab !== "market" || !hasContracts) return undefined;
+
+    refreshMarketListings();
+    const intervalId = window.setInterval(refreshMarketListings, 6000);
+    return () => window.clearInterval(intervalId);
   }, [activeTab, account, hasContracts]);
 
   async function getContracts() {
@@ -271,17 +273,67 @@ export function App() {
     };
   }
 
-  async function refreshState(nextAccount = account) {
-    if (!hasContracts || !window.ethereum) return;
+  async function loadMarketListings(provider) {
+    const readProvider = provider || new ethers.JsonRpcProvider(targetChain.rpcUrls[0]);
+    const launchpad = new ethers.Contract(megaMeme.launchpad.address, megaMeme.launchpad.abi, readProvider);
+    const nft = new ethers.Contract(megaMeme.nft.address, megaMeme.nft.abi, readProvider);
+    const marketListings = [];
+    const marketTokenIds = await launchpad.marketTokenIds();
+    const seen = new Set();
+
+    for (const id of marketTokenIds) {
+      const key = id.toString();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      try {
+        const listing = await launchpad.listings(id);
+        if (!listing.active) continue;
+        marketListings.push(await readNftCard(nft, id, {
+          seller: listing.seller,
+          price: listing.price,
+          priceEth: ethers.formatEther(listing.price)
+        }));
+      } catch (error) {
+        console.warn(`Skipped stale market listing ${key}`, error);
+      }
+    }
+
+    return marketListings;
+  }
+
+  async function refreshMarketListings() {
+    if (!hasContracts) return;
 
     try {
+      const marketListings = await loadMarketListings();
+      setState((currentState) => ({
+        ...currentState,
+        marketListings,
+        lastUpdated: Date.now()
+      }));
+    } catch (error) {
+      setStatus(error.shortMessage || error.message || "Market refresh failed.");
+    }
+  }
+
+  async function refreshState(nextAccount = account) {
+    if (!hasContracts) return;
+
+    try {
+      if (!window.ethereum) {
+        const marketListings = await loadMarketListings();
+        setState({ ...emptyState, marketListings, lastUpdated: Date.now() });
+        return;
+      }
+
       const walletProvider = new ethers.BrowserProvider(window.ethereum);
       const walletAccounts = await walletProvider.send("eth_accounts", []);
       const activeAccount = walletAccounts[0] || nextAccount;
 
       if (!activeAccount) {
+        const marketListings = await loadMarketListings();
         setAccount("");
-        setState(emptyState);
+        setState({ ...emptyState, marketListings, lastUpdated: Date.now() });
         setStatus("Connect wallet to sync live KETTY state.");
         return;
       }
@@ -294,7 +346,8 @@ export function App() {
       setChainId(Number(walletNetwork.chainId));
       setNetwork(walletNetwork.name === "unknown" ? `Chain ${walletNetwork.chainId}` : walletNetwork.name);
       if (megaMeme.chainId && Number(walletNetwork.chainId) !== megaMeme.chainId) {
-        setState({ ...emptyState, lastUpdated: Date.now() });
+        const marketListings = await loadMarketListings();
+        setState({ ...emptyState, marketListings, lastUpdated: Date.now() });
         setStatus(`Wallet is on chain ${walletNetwork.chainId}. Switch to ${targetChain.chainName} to sync KETTY live state.`);
         return;
       }
@@ -335,7 +388,7 @@ export function App() {
         nft.dynamicRemaining()
       ]);
       const ownedNfts = [];
-      const marketListings = [];
+      const marketListings = await loadMarketListings(walletProvider);
       let nftImage = "";
       let nftName = "";
       let nftTraits = [];
@@ -349,25 +402,6 @@ export function App() {
         nftImage = selected.image;
         nftName = selected.name;
         nftTraits = selected.traits;
-      }
-
-      const marketTokenIds = await launchpad.marketTokenIds();
-      const seen = new Set();
-      for (const id of marketTokenIds) {
-        const key = id.toString();
-        if (seen.has(key)) continue;
-        seen.add(key);
-        try {
-          const listing = await launchpad.listings(id);
-          if (!listing.active) continue;
-          marketListings.push(await readNftCard(nft, id, {
-            seller: listing.seller,
-            price: listing.price,
-            priceEth: ethers.formatEther(listing.price)
-          }));
-        } catch (error) {
-          console.warn(`Skipped stale market listing ${key}`, error);
-        }
       }
 
       setSelectedTokenId(nftActive ? nftId.toString() : "");
@@ -960,8 +994,8 @@ function MyKettyCatTab({ state, selectedTokenId, setSelectedTokenId, claimTaxRew
 }
 
 function MarketTab({ account, state, selectedTokenId, setSelectedTokenId, listingPrice, setListingPrice, listSelectedNft, cancelListing, buyListedNft, refreshState, busyAction }) {
-  const publicListings = state.marketListings.filter((item) => !account || item.listing.seller.toLowerCase() !== account.toLowerCase());
-  const ownListings = state.marketListings.filter((item) => account && item.listing.seller.toLowerCase() === account.toLowerCase());
+  const activeListings = state.marketListings;
+  const normalizedAccount = account?.toLowerCase() || "";
 
   return (
     <section className="market-layout">
@@ -988,10 +1022,10 @@ function MarketTab({ account, state, selectedTokenId, setSelectedTokenId, listin
         <div className="market-section-head">
           <div>
             <p className="section-kicker">Public listings</p>
-            <h2>Listed by other holders</h2>
+            <h2>Live KETTY cats</h2>
           </div>
           <div className="market-head-actions">
-            <strong>{publicListings.length} live</strong>
+            <strong>{activeListings.length} live</strong>
             <button className="icon-button" onClick={refreshState} aria-label="Refresh market" title="Refresh market">
               <RefreshCw size={18} />
             </button>
@@ -999,41 +1033,21 @@ function MarketTab({ account, state, selectedTokenId, setSelectedTokenId, listin
         </div>
 
         <div className="market-grid">
-          {publicListings.length === 0 ? (
-            <div className="empty-market">No public KETTY cats listed by other holders yet.</div>
-          ) : publicListings.map((item) => (
+          {activeListings.length === 0 ? (
+            <div className="empty-market">No KETTY cats are listed yet.</div>
+          ) : activeListings.map((item) => {
+            const isOwnListing = normalizedAccount && item.listing.seller.toLowerCase() === normalizedAccount;
+            return (
             <MarketCard
               key={item.id}
               item={item}
-              action="buy"
+              action={isOwnListing ? "cancel" : "buy"}
               busyAction={busyAction}
               onBuy={buyListedNft}
+              onCancel={cancelListing}
             />
-          ))}
+          ); })}
         </div>
-
-        {ownListings.length > 0 && (
-          <>
-            <div className="market-section-head own-listings-head">
-              <div>
-                <p className="section-kicker">Your listings</p>
-                <h2>Listed from your wallet</h2>
-              </div>
-              <strong>{ownListings.length} active</strong>
-            </div>
-            <div className="market-grid own-market-grid">
-              {ownListings.map((item) => (
-                <MarketCard
-                  key={item.id}
-                  item={item}
-                  action="cancel"
-                  busyAction={busyAction}
-                  onCancel={cancelListing}
-                />
-              ))}
-            </div>
-          </>
-        )}
       </div>
     </section>
   );
