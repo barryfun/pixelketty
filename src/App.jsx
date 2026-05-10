@@ -143,6 +143,7 @@ export function App() {
   const [listingPrice, setListingPrice] = useState("0.05");
   const [status, setStatus] = useState("Connect wallet and deploy the local launchpad to start testing.");
   const [busyAction, setBusyAction] = useState("");
+  const [connectingWallet, setConnectingWallet] = useState(false);
   const [marketStatus, setMarketStatus] = useState("Market syncing...");
   const [state, setState] = useState(emptyState);
 
@@ -235,22 +236,31 @@ export function App() {
   }
 
   async function connectWallet() {
+    setConnectingWallet(true);
+
     try {
       if (!window.ethereum) throw new Error("Install MetaMask or another EIP-1193 wallet first.");
+      setStatus(`Confirm wallet connection on ${targetChain.chainName}.`);
+      await switchNetwork({ silent: true });
       const provider = getInjectedProvider();
       const accounts = await provider.send("eth_requestAccounts", []);
       const activeNetwork = await provider.getNetwork();
+      if (megaMeme.chainId && Number(activeNetwork.chainId) !== megaMeme.chainId) {
+        throw new Error(`Connection rejected: wallet is on chain ${activeNetwork.chainId}. Switch to ${targetChain.chainName} and connect again.`);
+      }
       setAccount(accounts[0]);
       setChainId(Number(activeNetwork.chainId));
       setNetwork(formatNetworkName(activeNetwork));
-      setStatus("Wallet connected. Buy KETTY, mint NFTs, upgrade accessories, or trade in the market.");
+      setStatus(`Wallet connected on ${targetChain.chainName}. Buy KETTY, mint NFTs, upgrade accessories, or trade in the market.`);
       await refreshState(accounts[0]);
     } catch (error) {
       setStatus(error.shortMessage || error.message);
+    } finally {
+      setConnectingWallet(false);
     }
   }
 
-  async function switchNetwork() {
+  async function switchNetwork(options = {}) {
     if (!window.ethereum) return;
 
     try {
@@ -258,7 +268,7 @@ export function App() {
         method: "wallet_switchEthereumChain",
         params: [{ chainId: targetChain.chainId }]
       });
-      setStatus(`Switched to ${targetChain.chainName}.`);
+      if (!options.silent) setStatus(`Switched to ${targetChain.chainName}.`);
       window.setTimeout(() => refreshState(account), 150);
     } catch (error) {
       if (error.code === 4902) {
@@ -266,8 +276,10 @@ export function App() {
           method: "wallet_addEthereumChain",
           params: [targetChain]
         });
+        if (!options.silent) setStatus(`${targetChain.chainName} added. Connect again to continue.`);
       } else {
         setStatus(error.message);
+        throw error;
       }
     }
   }
@@ -725,8 +737,8 @@ export function App() {
           <button className="icon-button" onClick={switchNetwork} aria-label="Switch network" title={`Switch to ${targetChain.chainName}`}>
             <ArrowUpRight size={18} />
           </button>
-          <button className="wallet-button" onClick={connectWallet}>
-            <Wallet size={18} />
+          <button className="wallet-button" onClick={connectWallet} disabled={connectingWallet}>
+            {connectingWallet ? <Loader2 className="spin" size={18} /> : <Wallet size={18} />}
             {account ? shortAddress(account) : "Connect wallet"}
           </button>
         </div>
