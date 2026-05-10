@@ -121,7 +121,7 @@ export function App() {
   const [account, setAccount] = useState("");
   const [network, setNetwork] = useState("");
   const [chainId, setChainId] = useState(0);
-  const [activeTab, setActiveTab] = useState("launch");
+  const [activeTab, setActiveTab] = useState("home");
   const [buyAmount, setBuyAmount] = useState(10);
   const [sellAmount, setSellAmount] = useState(10);
   const [swapMode, setSwapMode] = useState("buy");
@@ -716,61 +716,19 @@ export function App() {
       </nav>
 
       <div className="tabbar">
-        <button className={activeTab === "launch" ? "active" : ""} onClick={() => setActiveTab("launch")}>Launch</button>
+        <button className={activeTab === "home" ? "active" : ""} onClick={() => setActiveTab("home")}>KETTY's HOME</button>
+        <button className={activeTab === "adopt" ? "active" : ""} onClick={() => setActiveTab("adopt")}>ADOPT KETTY</button>
         <button className={activeTab === "cats" ? "active" : ""} onClick={() => setActiveTab("cats")}>My KETTY CAT</button>
         <button className={activeTab === "market" ? "active" : ""} onClick={() => setActiveTab("market")}>NFT Market</button>
       </div>
 
-      <section className="hero">
-        <div className="hero-art" aria-hidden="true">
-          <RotatingKettyPreview />
-        </div>
+      {activeTab === "home" && (
+        <HomeTab
+          state={state}
+        />
+      )}
 
-        <div className="hero-copy">
-          <p className="eyebrow">Ethereum V4 hook concept</p>
-          <h1>KETTY</h1>
-          <p>
-            KETTY tokens power a fully on-chain pixel cat economy. Trade KETTY, mint multiple NFTs,
-            upgrade selected cats, and list ranked cats on the market.
-          </p>
-          <div className="hero-stats">
-            <span><strong>{formatToken(state.tokenBalance)}</strong> KETTY held</span>
-            <span><strong>{state.ownedNfts.length}</strong> NFTs owned</span>
-            <span><strong>{state.marketListings.length}</strong> Listed</span>
-          </div>
-        </div>
-      </section>
-
-      <section className="rules-panel">
-        <div className="rules-heading">
-          <p className="section-kicker">How KETTY works</p>
-          <h2>Mint cats, upgrade traits, claim holder rewards.</h2>
-        </div>
-        <div className="rules-grid">
-          <RuleCard
-            step="01"
-            title="Buy KETTY"
-            text="During launch, KETTY can be bought from the contract at 0.0005 ETH each. Trading opens after DEV adds pool liquidity."
-          />
-          <RuleCard
-            step="02"
-            title="Mint or upgrade"
-            text="Use 10 KETTY to mint a new KETTY CAT NFT, or spend 10 KETTY to upgrade a selected cat with one ranked accessory."
-          />
-          <RuleCard
-            step="03"
-            title="Holder rewards"
-            text="When hook tax rewards are recorded, accessory NFT holders can claim ETH rewards. More accessories mean higher reward weight."
-          />
-          <RuleCard
-            step="04"
-            title="Hidden dynamic cats"
-            text="A 5-accessory cat has a chance to become a dynamic NFT with animated on-chain backgrounds. Only 50 dynamic cats can ever exist."
-          />
-        </div>
-      </section>
-
-      {activeTab === "launch" && (
+      {activeTab === "adopt" && (
         <LaunchTab
           buyAmount={buyAmount}
           buyCost={buyCost}
@@ -819,12 +777,68 @@ export function App() {
         />
       )}
 
-      <section className="details-grid">
-        <InfoCard icon={<BarChart3 />} title="Launch phase" text="KETTY cannot be sold back to the contract. Trading opens only after the DEV wallet adds pool liquidity." />
-        <InfoCard icon={<ShoppingBag />} title="NFT Market" text="List, cancel, or buy ranked KETTY cats. Cards show each NFT's accessory ranks." />
-        <InfoCard icon={<Flame />} title="ETH chain target" text="Local Hardhat first, then Ethereum Sepolia or mainnet with Uniswap v4 PoolManager and router addresses." />
-      </section>
     </main>
+  );
+}
+
+function HomeTab({ state }) {
+  return (
+    <>
+      <section className="hero">
+        <div className="hero-art" aria-hidden="true">
+          <RotatingKettyPreview />
+        </div>
+
+        <div className="hero-copy">
+          <p className="eyebrow">Ethereum V4 hook concept</p>
+          <h1>KETTY</h1>
+          <p>
+            KETTY tokens power a fully on-chain pixel cat economy. Buy KETTY, adopt multiple NFTs,
+            upgrade selected cats, claim holder rewards, and list ranked cats on the market.
+          </p>
+          <div className="hero-stats">
+            <span><strong>{formatToken(state.tokenBalance)}</strong> KETTY held</span>
+            <span><strong>{state.ownedNfts.length}</strong> NFTs owned</span>
+            <span><strong>{state.marketListings.length}</strong> Listed</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="rules-panel">
+        <div className="rules-heading">
+          <p className="section-kicker">How KETTY works</p>
+          <h2>Mint cats, upgrade traits, claim holder rewards.</h2>
+        </div>
+        <div className="rules-grid">
+          <RuleCard
+            step="01"
+            title="Buy KETTY"
+            text="During launch, KETTY can be bought from the contract at 0.0005 ETH each. Trading opens after DEV adds pool liquidity."
+          />
+          <RuleCard
+            step="02"
+            title="Mint or upgrade"
+            text="Use 10 KETTY to mint a new KETTY CAT NFT, or spend 10 KETTY to upgrade a selected cat with one ranked accessory."
+          />
+          <RuleCard
+            step="03"
+            title="Holder rewards"
+            text="When hook tax rewards are recorded, accessory NFT holders can claim ETH rewards. More accessories mean higher reward weight."
+          />
+          <RuleCard
+            step="04"
+            title="Hidden dynamic cats"
+            text="A 5-accessory cat has a chance to become a dynamic NFT with animated on-chain backgrounds. Only 50 dynamic cats can ever exist."
+          />
+        </div>
+      </section>
+
+      <section className="details-grid">
+        <InfoCard icon={<BarChart3 />} title="Launch phase" text="Trading opens after the DEV wallet adds pool liquidity. Until then, KETTY powers adoption, upgrades, and rewards." />
+        <InfoCard icon={<ShoppingBag />} title="NFT Market" text="List, cancel, or buy ranked KETTY cats. Cards show each NFT's accessory ranks." />
+        <InfoCard icon={<Flame />} title="Holder rewards" text="Accessory holders can claim ETH rewards when hook tax rewards are recorded into the pool." />
+      </section>
+    </>
   );
 }
 
