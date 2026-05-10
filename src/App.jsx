@@ -829,6 +829,19 @@ export function App() {
         />
       )}
 
+      <footer className="site-footer">
+        <span>KETTY PARTY</span>
+        <a
+          className="x-link"
+          href="https://x.com/PixelKettyDOT"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Open Pixel Ketty on X"
+          title="Pixel Ketty on X"
+        >
+          <XLogo />
+        </a>
+      </footer>
     </main>
   );
 }
@@ -1352,5 +1365,13 @@ function RuleCard({ step, title, text }) {
       <h3>{title}</h3>
       <p>{text}</p>
     </article>
+  );
+}
+
+function XLogo() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M13.9 10.5 21.3 2h-1.8l-6.4 7.4L8 2H2l7.8 11.3L2 22h1.8l6.8-7.8 5.4 7.8h6L13.9 10.5Zm-2.4 2.8-.8-1.1L4.4 3.3h2.7l5 7.1.8 1.1 6.6 9.3h-2.7l-5.3-7.5Z" />
+    </svg>
   );
 }

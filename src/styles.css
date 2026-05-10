@@ -36,7 +36,8 @@ button {
 .trade-layout,
 .dex-layout,
 .cat-layout,
-.market-layout {
+.market-layout,
+.site-footer {
   margin: 0 auto;
   max-width: 1280px;
   padding-left: 28px;
@@ -980,6 +981,36 @@ h3 {
   line-height: 1.55;
 }
 
+.site-footer {
+  align-items: center;
+  border-top: 1px solid rgba(20, 20, 20, 0.18);
+  color: #5f594d;
+  display: flex;
+  font-size: 12px;
+  font-weight: 900;
+  justify-content: space-between;
+  letter-spacing: 0.12em;
+  min-height: 74px;
+  text-transform: uppercase;
+}
+
+.x-link {
+  align-items: center;
+  background: #141414;
+  color: #f4f1e9;
+  display: inline-flex;
+  height: 42px;
+  justify-content: center;
+  text-decoration: none;
+  width: 42px;
+}
+
+.x-link svg {
+  fill: currentColor;
+  height: 19px;
+  width: 19px;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -1037,6 +1068,7 @@ h3 {
   .dex-layout,
   .cat-layout,
   .market-layout,
+  .site-footer,
   .rules-panel,
   .details-grid {
     padding-left: 16px;
