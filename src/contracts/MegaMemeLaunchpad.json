@@ -1,7 +1,7 @@
 {
-  "chainId": 11155111,
+  "chainId": 1,
   "launchpad": {
-    "address": "0xE2E28e310Ce31DFc9264f0Ef56239715ca262F18",
+    "address": "0x952a767d97afDA842eF3F8395DA9356cD7Ac359A",
     "abi": [
       {
         "inputs": [],
@@ -1052,7 +1052,7 @@
     ]
   },
   "token": {
-    "address": "0x7572b3462363f00d8631eb64022ff1fe5F9A2243",
+    "address": "0xA5A0e805e7f989f1266DF1BbC0cC63ec2035675e",
     "abi": [
       {
         "inputs": [
@@ -1375,7 +1375,7 @@
     ]
   },
   "nft": {
-    "address": "0x246241ffA98eC34d88b8aD1EFf3a71D0Bc9B3534",
+    "address": "0x87A2F8E860f2F41E152c9ab5C5EAbF91C1f63Fd9",
     "abi": [
       {
         "inputs": [
@@ -2032,7 +2032,7 @@
     ]
   },
   "hook": {
-    "address": "0xE4962c27BD4C5B9B55B320E6f0Da22281Abf127E",
+    "address": "0x32898076295B4ebe9e00848f2f6dc3c1FcBD02bd",
     "abi": [
       {
         "inputs": [

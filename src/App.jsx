@@ -17,6 +17,13 @@ import {
 import megaMeme from "./contracts/MegaMemeLaunchpad.json";
 
 const chains = {
+  1: {
+    chainId: "0x1",
+    chainName: "Ethereum Mainnet",
+    nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+    rpcUrls: ["https://ethereum-rpc.publicnode.com"],
+    blockExplorerUrls: ["https://etherscan.io"]
+  },
   31337: {
     chainId: "0x7a69",
     chainName: "Hardhat Localhost",

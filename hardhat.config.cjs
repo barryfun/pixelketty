@@ -1,7 +1,9 @@
 require("@nomicfoundation/hardhat-toolbox");
 
 const sepoliaRpcUrl = process.env.SEPOLIA_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com";
+const mainnetRpcUrl = process.env.MAINNET_RPC_URL || "https://ethereum-rpc.publicnode.com";
 const deployerPrivateKey = process.env.DEPLOYER_PRIVATE_KEY;
+const mainnetPrivateKey = process.env.MAINNET_PRIVATE_KEY;
 
 module.exports = {
   solidity: {
@@ -26,6 +28,11 @@ module.exports = {
       url: sepoliaRpcUrl,
       chainId: 11155111,
       accounts: deployerPrivateKey ? [deployerPrivateKey] : []
+    },
+    mainnet: {
+      url: mainnetRpcUrl,
+      chainId: 1,
+      accounts: mainnetPrivateKey ? [mainnetPrivateKey] : []
     }
   }
 };
