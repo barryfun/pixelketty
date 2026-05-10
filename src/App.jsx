@@ -511,10 +511,13 @@ export function App() {
     setStatus("Confirm approval so the launchpad can take KETTY when you sell.");
 
     try {
-      const { token } = await getContracts();
+      const { signer, token } = await getContracts();
+      const signerAddress = await signer.getAddress();
       const tx = await token.approve(megaMeme.launchpad.address, ethers.MaxUint256);
       await tx.wait();
-      await refreshState();
+      const freshAllowance = await token.allowance(signerAddress, megaMeme.launchpad.address);
+      setState((currentState) => ({ ...currentState, allowance: freshAllowance }));
+      await refreshState(signerAddress);
       setStatus("Approval complete. You can sell KETTY now.");
     } catch (error) {
       setStatus(error.shortMessage || error.message || "Approval failed.");
