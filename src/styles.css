@@ -36,8 +36,7 @@ button {
 .trade-layout,
 .dex-layout,
 .cat-layout,
-.market-layout,
-.details-grid {
+.market-layout {
   margin: 0 auto;
   max-width: 1280px;
   padding-left: 28px;
@@ -80,9 +79,18 @@ button {
 }
 
 .brand-mark {
-  border-radius: 2px;
-  height: 34px;
-  width: 34px;
+  border: 1px solid #141414;
+  border-radius: 50%;
+  height: 38px;
+  overflow: hidden;
+  width: 38px;
+}
+
+.brand-mark img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .nav-actions {
@@ -120,7 +128,7 @@ a.icon-button {
 .tabbar {
   border-bottom: 1px solid rgba(20, 20, 20, 0.18);
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   padding-top: 0;
 }
 
@@ -877,7 +885,10 @@ h3 {
   display: grid;
   gap: 0;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
   padding-bottom: 72px;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .rules-panel {
@@ -940,8 +951,13 @@ h3 {
 }
 
 .info-card {
+  border-left: 1px solid rgba(20, 20, 20, 0.18);
   min-height: 220px;
-  padding: 28px;
+  padding: 28px clamp(28px, 4vw, 56px);
+}
+
+.info-card:first-child {
+  border-left: 0;
 }
 
 .info-icon {

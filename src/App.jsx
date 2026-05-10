@@ -63,6 +63,7 @@ const accessoryTraits = ["Crown Rank", "Earrings Rank", "Visor Rank", "Star Rank
 const configuredDexScreenerUrl = (import.meta.env.VITE_DEXSCREENER_URL || "").trim();
 const dexScreenerFallbackUrl = "https://dexscreener.com/ethereum";
 const targetChain = chains[megaMeme.chainId] || chains[31337];
+const showMarketTab = false;
 const svgToImage = (svg) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 const fallbackMarketImage = svgToImage(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="crispEdges"><rect width="512" height="512" fill="#202624"/><rect x="116" y="190" width="280" height="190" fill="#c9d0cd" stroke="#0d1010" stroke-width="16"/><rect x="148" y="134" width="76" height="88" fill="#bfc7c4" stroke="#0d1010" stroke-width="14"/><rect x="288" y="134" width="76" height="88" fill="#bfc7c4" stroke="#0d1010" stroke-width="14"/><rect x="188" y="244" width="136" height="118" fill="#f0e3d2"/><rect x="184" y="244" width="28" height="48" fill="#0d1010"/><rect x="300" y="244" width="28" height="48" fill="#0d1010"/><rect x="244" y="292" width="24" height="22" fill="#0d1010"/><rect x="214" y="322" width="84" height="18" fill="#0d1010"/><text x="34" y="52" fill="#fff" font-family="monospace" font-size="22" font-weight="900">KETTY LISTING</text><text x="34" y="456" fill="#fff" font-family="monospace" font-size="18" font-weight="900">METADATA LOADING</text></svg>`);
 const getInjectedProvider = () => new ethers.BrowserProvider(window.ethereum, "any");
@@ -675,7 +676,7 @@ export function App() {
       await tx.wait();
       await refreshState();
       setStatus("NFT listed on the KETTY market.");
-      setActiveTab("market");
+      setActiveTab(showMarketTab ? "market" : "cats");
     } catch (error) {
       setStatus(error.shortMessage || error.message || "Listing failed.");
     } finally {
@@ -750,8 +751,10 @@ export function App() {
     <main className="app-shell">
       <nav className="topbar">
         <div className="brand">
-          <span className="brand-mark"><Flame size={19} /></span>
-          KETTY Launchpad
+          <span className="brand-mark">
+            <img src="/pixel-ketty-logo.jpeg" alt="" />
+          </span>
+          PIXEL KETTY's PARTY
         </div>
         <div className="nav-actions">
           <button className="icon-button" onClick={switchNetwork} aria-label="Switch network" title={`Switch to ${targetChain.chainName}`}>
@@ -768,7 +771,7 @@ export function App() {
         <button className={activeTab === "home" ? "active" : ""} onClick={() => setActiveTab("home")}>KETTY's HOME</button>
         <button className={activeTab === "adopt" ? "active" : ""} onClick={() => setActiveTab("adopt")}>ADOPT KETTY</button>
         <button className={activeTab === "cats" ? "active" : ""} onClick={() => setActiveTab("cats")}>My KETTY CAT</button>
-        <button className={activeTab === "market" ? "active" : ""} onClick={() => setActiveTab("market")}>NFT Market</button>
+        {showMarketTab && <button className={activeTab === "market" ? "active" : ""} onClick={() => setActiveTab("market")}>NFT Market</button>}
       </div>
 
       {activeTab === "home" && (
@@ -809,7 +812,7 @@ export function App() {
         />
       )}
 
-      {activeTab === "market" && (
+      {showMarketTab && activeTab === "market" && (
         <MarketTab
           account={account}
           state={state}
