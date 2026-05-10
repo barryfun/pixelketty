@@ -741,6 +741,35 @@ export function App() {
         </div>
       </section>
 
+      <section className="rules-panel">
+        <div className="rules-heading">
+          <p className="section-kicker">How KETTY works</p>
+          <h2>Mint cats, upgrade traits, claim holder rewards.</h2>
+        </div>
+        <div className="rules-grid">
+          <RuleCard
+            step="01"
+            title="Buy KETTY"
+            text="During launch, KETTY can be bought from the contract at 0.0005 ETH each. Contract sell-back is disabled; trading opens after DEV adds pool liquidity."
+          />
+          <RuleCard
+            step="02"
+            title="Mint or upgrade"
+            text="Use 10 KETTY to mint a new KETTY CAT NFT, or spend 10 KETTY to upgrade a selected cat with one ranked accessory."
+          />
+          <RuleCard
+            step="03"
+            title="Holder rewards"
+            text="When hook tax rewards are recorded, accessory NFT holders can claim ETH rewards. More accessories mean higher reward weight."
+          />
+          <RuleCard
+            step="04"
+            title="Hidden dynamic cats"
+            text="A 5-accessory cat has a chance to become a dynamic NFT with animated on-chain backgrounds. Only 50 dynamic cats can ever exist."
+          />
+        </div>
+      </section>
+
       {activeTab === "launch" && (
         <LaunchTab
           buyAmount={buyAmount}
@@ -1247,6 +1276,16 @@ function InfoCard({ icon, title, text }) {
   return (
     <article className="info-card">
       <span className="info-icon">{icon}</span>
+      <h3>{title}</h3>
+      <p>{text}</p>
+    </article>
+  );
+}
+
+function RuleCard({ step, title, text }) {
+  return (
+    <article className="rule-card">
+      <span>{step}</span>
       <h3>{title}</h3>
       <p>{text}</p>
     </article>

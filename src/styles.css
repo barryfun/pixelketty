@@ -880,6 +880,65 @@ h3 {
   padding-bottom: 72px;
 }
 
+.rules-panel {
+  border-top: 1px solid rgba(20, 20, 20, 0.18);
+  display: grid;
+  gap: 0;
+  grid-template-columns: minmax(280px, 0.34fr) minmax(0, 0.66fr);
+}
+
+.rules-heading {
+  border-left: 1px solid rgba(20, 20, 20, 0.18);
+  min-height: 260px;
+  padding: 28px;
+}
+
+.rules-heading h2 {
+  font-size: clamp(28px, 4vw, 52px);
+  line-height: 0.96;
+  max-width: 520px;
+}
+
+.rules-grid {
+  border-left: 1px solid rgba(20, 20, 20, 0.18);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rule-card {
+  border-bottom: 1px solid rgba(20, 20, 20, 0.18);
+  border-left: 1px solid rgba(20, 20, 20, 0.18);
+  display: grid;
+  gap: 14px;
+  min-height: 220px;
+  padding: 28px;
+}
+
+.rule-card:nth-child(odd) {
+  border-left: 0;
+}
+
+.rule-card:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.rule-card span {
+  color: #8f3c25;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.rule-card h3 {
+  font-size: 28px;
+}
+
+.rule-card p {
+  color: #5f594d;
+  line-height: 1.55;
+  margin: 0;
+}
+
 .info-card {
   min-height: 220px;
   padding: 28px;
@@ -917,7 +976,9 @@ h3 {
   .dex-layout,
   .cat-layout,
   .market-layout,
+  .rules-panel,
   .details-grid,
+  .rules-grid,
   .dex-metrics,
   .market-grid,
   .cat-gallery {
@@ -940,6 +1001,9 @@ h3 {
   .cat-gallery,
   .market-controls,
   .market-feed,
+  .rules-heading,
+  .rules-grid,
+  .rule-card,
   .info-card,
   .market-grid,
   .nft-card,
@@ -957,6 +1021,7 @@ h3 {
   .dex-layout,
   .cat-layout,
   .market-layout,
+  .rules-panel,
   .details-grid {
     padding-left: 16px;
     padding-right: 16px;
