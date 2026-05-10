@@ -816,7 +816,8 @@ h3 {
   top: 36px;
 }
 
-.seller-line {
+.seller-line,
+.reward-line {
   align-items: center;
   border-bottom: 1px solid rgba(20, 20, 20, 0.18);
   border-top: 1px solid rgba(20, 20, 20, 0.18);
@@ -825,7 +826,8 @@ h3 {
   padding: 10px 0;
 }
 
-.seller-line span {
+.seller-line span,
+.reward-line span {
   color: #5f594d;
   font-size: 11px;
   font-weight: 900;
@@ -833,7 +835,8 @@ h3 {
   text-transform: uppercase;
 }
 
-.seller-line strong {
+.seller-line strong,
+.reward-line strong {
   color: #141414;
   font-size: 13px;
 }

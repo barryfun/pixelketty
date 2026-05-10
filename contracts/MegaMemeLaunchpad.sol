@@ -81,24 +81,13 @@ contract MemeLaunchpadDemo {
 
         token.transfer(msg.sender, tokenAmount);
         hook.afterSwap(msg.sender);
-        _maybeSeedLiquidity();
 
         emit Buy(msg.sender, tokenAmount, cost);
     }
 
-    function sell(uint256 wholeTokens) external {
-        require(wholeTokens > 0, "bad amount");
-        uint256 tokenAmount = wholeTokens * TOKEN_UNIT;
-        uint256 payout = quoteSell(wholeTokens);
-        require(address(this).balance >= payout, "insufficient ETH");
-
-        token.transferFrom(msg.sender, address(this), tokenAmount);
-        hook.afterSwap(msg.sender);
-
-        (bool sent, ) = payable(msg.sender).call{value: payout}("");
-        require(sent, "ETH send failed");
-
-        emit Sell(msg.sender, tokenAmount, payout);
+    function sell(uint256 wholeTokens) external pure {
+        wholeTokens;
+        revert("contract sell disabled");
     }
 
     function mintKettyNft() external {
@@ -232,7 +221,8 @@ contract MemeLaunchpadDemo {
     }
 
     function quoteSell(uint256 wholeTokens) public pure returns (uint256) {
-        return (wholeTokens * PRICE_PER_TOKEN * SELL_REFUND_BPS) / BPS;
+        wholeTokens;
+        return 0;
     }
 
     function quoteTradeTax(uint256 grossEthAmount) public pure returns (uint256) {
@@ -257,19 +247,26 @@ contract MemeLaunchpadDemo {
         return taxEthToHolders - taxEthClaimed;
     }
 
-    function sellRefundReserve() public view returns (uint256) {
-        uint256 contractTokenBalance = token.balanceOf(address(this));
-        if (contractTokenBalance >= MAX_SUPPLY) return 0;
+    function sellRefundReserve() public pure returns (uint256) {
+        return 0;
+    }
 
-        uint256 sellableTokenAmount = MAX_SUPPLY - contractTokenBalance;
-        return quoteSell(sellableTokenAmount / TOKEN_UNIT);
+    function launchLiquidityEthReserve() public view returns (uint256) {
+        if (soldFromLaunchpad == 0) return 0;
+        return (quoteBuy(soldFromLaunchpad / TOKEN_UNIT) * SELL_REFUND_BPS) / BPS;
     }
 
     function withdrawableDevEth() public view returns (uint256) {
-        uint256 reservedEth = sellRefundReserve() + pendingHolderTax();
+        uint256 reservedEth = pendingHolderTax();
         uint256 balance = address(this).balance;
         if (balance <= reservedEth) return 0;
         return balance - reservedEth;
+    }
+
+    function seedLiquidity() external onlyDev {
+        require(!liquiditySeeded, "liquidity seeded");
+        require(soldFromLaunchpad >= SALE_SUPPLY, "sale active");
+        _seedLiquidity();
     }
 
     function remainingForSale() external view returns (uint256) {
@@ -308,8 +305,7 @@ contract MemeLaunchpadDemo {
         emit DevFeePaid(devWallet, amount);
     }
 
-    function _maybeSeedLiquidity() private {
-        if (liquiditySeeded || soldFromLaunchpad < SALE_SUPPLY) return;
+    function _seedLiquidity() private {
         liquiditySeeded = true;
         liquidityEthSeeded = address(this).balance;
         liquidityTokenSeeded = LIQUIDITY_SUPPLY;

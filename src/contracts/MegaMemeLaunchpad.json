@@ -1,7 +1,7 @@
 {
   "chainId": 11155111,
   "launchpad": {
-    "address": "0xbf27dffCCcea8E79617edd1c8E250b3CC71EEB03",
+    "address": "0xE2E28e310Ce31DFc9264f0Ef56239715ca262F18",
     "abi": [
       {
         "inputs": [],
@@ -647,6 +647,19 @@
       },
       {
         "inputs": [],
+        "name": "launchLiquidityEthReserve",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
         "name": "liquidityEthSeeded",
         "outputs": [
           {
@@ -868,6 +881,13 @@
         "type": "function"
       },
       {
+        "inputs": [],
+        "name": "seedLiquidity",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
         "inputs": [
           {
             "internalType": "uint256",
@@ -877,7 +897,7 @@
         ],
         "name": "sell",
         "outputs": [],
-        "stateMutability": "nonpayable",
+        "stateMutability": "pure",
         "type": "function"
       },
       {
@@ -890,7 +910,7 @@
             "type": "uint256"
           }
         ],
-        "stateMutability": "view",
+        "stateMutability": "pure",
         "type": "function"
       },
       {
@@ -1032,7 +1052,7 @@
     ]
   },
   "token": {
-    "address": "0xC2BB93a1ecFF419fd502A5a2d40Fc406213f1a87",
+    "address": "0x7572b3462363f00d8631eb64022ff1fe5F9A2243",
     "abi": [
       {
         "inputs": [
@@ -1355,7 +1375,7 @@
     ]
   },
   "nft": {
-    "address": "0x499Ff7E54ac524c25AC330F9E31Bfda8Ca4b04F4",
+    "address": "0x246241ffA98eC34d88b8aD1EFf3a71D0Bc9B3534",
     "abi": [
       {
         "inputs": [
@@ -2012,7 +2032,7 @@
     ]
   },
   "hook": {
-    "address": "0x590de51CB027a3A5d8Ae5fFb294D7906A8e83464",
+    "address": "0xE4962c27BD4C5B9B55B320E6f0Da22281Abf127E",
     "abi": [
       {
         "inputs": [

@@ -72,7 +72,7 @@ describe("MegaMemeLaunchpad", function () {
     expect(await nft.powerOf(1)).to.equal(ethers.parseEther("60"));
   });
 
-  it("keeps unsent KETTY sellable after NFT and accessory spending", async function () {
+  it("keeps unused KETTY in the wallet but blocks contract sells during launch", async function () {
     const { launchpad, token, nft, alice } = await deployLaunchpad();
 
     await launchpad.connect(alice).buy(30, { value: await launchpad.quoteBuy(30) });
@@ -83,14 +83,14 @@ describe("MegaMemeLaunchpad", function () {
     expect(await nft.accessoryCountOf(1)).to.equal(1);
 
     await token.connect(alice).approve(await launchpad.getAddress(), ethers.parseEther("10"));
-    await launchpad.connect(alice).sell(10);
+    await expect(launchpad.connect(alice).sell(10)).to.be.revertedWith("contract sell disabled");
 
-    expect(await token.balanceOf(alice.address)).to.equal(0);
+    expect(await token.balanceOf(alice.address)).to.equal(ethers.parseEther("10"));
     expect(await nft.isActive(1)).to.equal(true);
     expect(await nft.accessoryCountOf(1)).to.equal(1);
   });
 
-  it("splits buys 30% to dev and 70% to the contract, then refunds sells at 70%", async function () {
+  it("splits buys 30% to dev and 70% to the contract, with contract sells disabled", async function () {
     const { launchpad, token, owner, alice } = await deployLaunchpad();
     const launchpadAddress = await launchpad.getAddress();
 
@@ -102,33 +102,29 @@ describe("MegaMemeLaunchpad", function () {
 
     expect(await token.balanceOf(alice.address)).to.equal(ethers.parseEther("100"));
     expect(await launchpad.devEthCollected()).to.equal(ethers.parseEther("0.015"));
-    expect(await launchpad.quoteSell(100)).to.equal(ethers.parseEther("0.035"));
+    expect(await launchpad.quoteSell(100)).to.equal(0);
+    expect(await launchpad.launchLiquidityEthReserve()).to.equal(ethers.parseEther("0.035"));
 
     await token.connect(alice).approve(launchpadAddress, ethers.parseEther("100"));
-    await expect(launchpad.connect(alice).sell(100))
-      .to.changeEtherBalances([alice, launchpad], [ethers.parseEther("0.035"), ethers.parseEther("-0.035")]);
+    await expect(launchpad.connect(alice).sell(100)).to.be.revertedWith("contract sell disabled");
   });
 
-  it("lets only the dev withdraw surplus ETH that is not reserved for sells or holder rewards", async function () {
+  it("lets only the dev withdraw launch ETH while preserving holder reward reserves", async function () {
     const { launchpad, alice, bob } = await deployLaunchpad();
     const launchpadAddress = await launchpad.getAddress();
 
     await launchpad.connect(alice).buy(20, { value: await launchpad.quoteBuy(20) });
     expect(await ethers.provider.getBalance(launchpadAddress)).to.equal(ethers.parseEther("0.007"));
-    expect(await launchpad.sellRefundReserve()).to.equal(ethers.parseEther("0.007"));
-    expect(await launchpad.withdrawableDevEth()).to.equal(0);
+    expect(await launchpad.sellRefundReserve()).to.equal(0);
+    expect(await launchpad.launchLiquidityEthReserve()).to.equal(ethers.parseEther("0.007"));
+    expect(await launchpad.withdrawableDevEth()).to.equal(ethers.parseEther("0.007"));
 
-    await expect(launchpad.devWithdrawEth(1)).to.be.revertedWith("exceeds withdrawable");
-    await launchpad.connect(alice).mintKettyNft();
-
-    expect(await launchpad.sellRefundReserve()).to.equal(ethers.parseEther("0.0035"));
-    expect(await launchpad.withdrawableDevEth()).to.equal(ethers.parseEther("0.0035"));
-    await expect(launchpad.connect(bob).devWithdrawEth(ethers.parseEther("0.0035"))).to.be.revertedWith("not dev");
-    await expect(launchpad.devWithdrawEth(ethers.parseEther("0.0035")))
+    await expect(launchpad.connect(bob).devWithdrawEth(ethers.parseEther("0.007"))).to.be.revertedWith("not dev");
+    await expect(launchpad.devWithdrawEth(ethers.parseEther("0.007")))
       .to.emit(launchpad, "DevWithdrawal")
-      .withArgs(await launchpad.devWallet(), ethers.parseEther("0.0035"));
+      .withArgs(await launchpad.devWallet(), ethers.parseEther("0.007"));
 
-    expect(await ethers.provider.getBalance(launchpadAddress)).to.equal(ethers.parseEther("0.0035"));
+    expect(await ethers.provider.getBalance(launchpadAddress)).to.equal(0);
     expect(await launchpad.withdrawableDevEth()).to.equal(0);
   });
 
@@ -139,9 +135,12 @@ describe("MegaMemeLaunchpad", function () {
       .to.changeEtherBalances(
         [alice, owner, launchpad],
         [ethers.parseEther("-25"), ethers.parseEther("7.5"), ethers.parseEther("17.5")]
-      );
+    );
 
     expect(await launchpad.remainingForSale()).to.equal(0);
+    expect(await launchpad.liquiditySeeded()).to.equal(false);
+    await expect(launchpad.connect(alice).seedLiquidity()).to.be.revertedWith("not dev");
+    await expect(launchpad.seedLiquidity()).to.emit(launchpad, "LiquiditySeeded").withArgs(ethers.parseEther("17.5"));
     expect(await launchpad.liquiditySeeded()).to.equal(true);
     expect(await launchpad.liquidityEthSeeded()).to.equal(ethers.parseEther("17.5"));
     expect(await launchpad.liquidityTokenSeeded()).to.equal(ethers.parseEther("20000"));

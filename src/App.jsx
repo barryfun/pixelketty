@@ -245,17 +245,19 @@ export function App() {
     }
   }
 
-  async function readNftCard(nft, tokenId, listing = null) {
+  async function readNftCard(nft, tokenId, listing = null, launchpad = null) {
     const metadata = decodeTokenUri(await nft.tokenURI(tokenId));
     const accessoryCount = Number(await nft.accessoryCountOf(tokenId));
     const dynamicTrait = (metadata.attributes || []).find((trait) => trait.trait_type === "Dynamic NFT");
     const dynamicBackgroundTrait = (metadata.attributes || []).find((trait) => trait.trait_type === "Dynamic Background");
+    const claimableReward = launchpad ? await launchpad.claimableTaxReward(tokenId) : 0n;
     return {
       id: tokenId.toString(),
       name: metadata.name,
       image: metadata.image,
       traits: metadata.attributes || [],
       accessoryCount,
+      claimableReward,
       isDynamic: dynamicTrait?.value === "Yes",
       dynamicBackground: dynamicBackgroundTrait?.value || "Static",
       ranks: (metadata.attributes || []).filter((trait) => accessoryTraits.includes(trait.trait_type)),
@@ -333,11 +335,11 @@ export function App() {
       let nftTraits = [];
 
       for (const id of ownedNftIds) {
-        ownedNfts.push(await readNftCard(nft, id));
+        ownedNfts.push(await readNftCard(nft, id, null, launchpad));
       }
 
       if (nftActive) {
-        const selected = await readNftCard(nft, nftId);
+        const selected = await readNftCard(nft, nftId, null, launchpad);
         nftImage = selected.image;
         nftName = selected.name;
         nftTraits = selected.traits;
@@ -598,6 +600,23 @@ export function App() {
     }
   }
 
+  async function claimTaxReward(tokenId) {
+    setBusyAction(`claim-${tokenId}`);
+    setStatus(`Claiming KETTY CAT #${tokenId} rewards...`);
+
+    try {
+      const { launchpad } = await getContracts();
+      const tx = await launchpad.claimTaxReward(tokenId);
+      await tx.wait();
+      await refreshState();
+      setStatus(`Rewards claimed for KETTY CAT #${tokenId}.`);
+    } catch (error) {
+      setStatus(error.shortMessage || error.message || "Reward claim failed.");
+    } finally {
+      setBusyAction("");
+    }
+  }
+
   async function executeSwap() {
     if (swapMode === "buy") {
       await buyMeme(swapAmount);
@@ -630,7 +649,6 @@ export function App() {
 
       <div className="tabbar">
         <button className={activeTab === "launch" ? "active" : ""} onClick={() => setActiveTab("launch")}>Launch</button>
-        <button className={activeTab === "trade" ? "active" : ""} onClick={() => setActiveTab("trade")}>Trade</button>
         <button className={activeTab === "cats" ? "active" : ""} onClick={() => setActiveTab("cats")}>My KETTY CAT</button>
         <button className={activeTab === "market" ? "active" : ""} onClick={() => setActiveTab("market")}>NFT Market</button>
       </div>
@@ -675,28 +693,13 @@ export function App() {
         />
       )}
 
-      {activeTab === "trade" && (
-        <TradeTab
-          state={state}
-          swapMode={swapMode}
-          setSwapMode={setSwapMode}
-          swapAmount={swapAmount}
-          setSwapAmount={setSwapAmount}
-          swapQuote={swapQuote}
-          swapNeedsApproval={swapNeedsApproval}
-          busyAction={busyAction}
-          executeSwap={executeSwap}
-          network={network}
-          dexScreenerUrl={dexScreenerUrl}
-          dexScreenerEmbedUrl={dexScreenerEmbedUrl}
-        />
-      )}
-
       {activeTab === "cats" && (
         <MyKettyCatTab
           state={state}
           selectedTokenId={selectedTokenId}
           setSelectedTokenId={setSelectedTokenId}
+          claimTaxReward={claimTaxReward}
+          busyAction={busyAction}
           refreshState={() => refreshState()}
           status={status}
         />
@@ -718,7 +721,7 @@ export function App() {
       )}
 
       <section className="details-grid">
-        <InfoCard icon={<BarChart3 />} title="Trade tab" text="Dexscreener chart embeds once the KETTY pair URL is configured, beside the local swap panel." />
+        <InfoCard icon={<BarChart3 />} title="Launch phase" text="KETTY cannot be sold back to the contract. Trading opens only after the DEV wallet adds pool liquidity." />
         <InfoCard icon={<ShoppingBag />} title="NFT Market" text="List, cancel, or buy ranked KETTY cats. Cards show each NFT's accessory ranks." />
         <InfoCard icon={<Flame />} title="ETH chain target" text="Local Hardhat first, then Ethereum Sepolia or mainnet with Uniswap v4 PoolManager and router addresses." />
       </section>
@@ -880,8 +883,9 @@ function TradeTab({ state, swapMode, setSwapMode, swapAmount, setSwapAmount, swa
   );
 }
 
-function MyKettyCatTab({ state, selectedTokenId, setSelectedTokenId, refreshState, status }) {
+function MyKettyCatTab({ state, selectedTokenId, setSelectedTokenId, claimTaxReward, busyAction, refreshState, status }) {
   const selectedCat = state.ownedNfts.find((item) => item.id === selectedTokenId) || state.ownedNfts[0];
+  const selectedClaimable = selectedCat?.claimableReward || 0n;
 
   return (
     <section className="cat-layout">
@@ -900,8 +904,17 @@ function MyKettyCatTab({ state, selectedTokenId, setSelectedTokenId, refreshStat
           <Metric label="KETTY held" value={`${formatToken(state.tokenBalance)} KETTY`} />
           <Metric label="Selected" value={selectedCat ? `#${selectedCat.id}` : "None"} />
           <Metric label="Accessories" value={selectedCat ? `${selectedCat.accessoryCount} / 5` : "0 / 5"} />
+          <Metric label="Claimable" value={`${formatEth(selectedClaimable)} ETH`} />
         </div>
         <NftSelector ownedNfts={state.ownedNfts} selectedTokenId={selectedTokenId} setSelectedTokenId={setSelectedTokenId} />
+        <button
+          className="primary-button secondary"
+          onClick={() => claimTaxReward(selectedCat.id)}
+          disabled={!selectedCat || selectedClaimable === 0n || busyAction === `claim-${selectedCat?.id}`}
+        >
+          {busyAction === `claim-${selectedCat?.id}` ? <Loader2 className="spin" size={18} /> : <BadgeCheck size={18} />}
+          Claim Rewards
+        </button>
         <p className="status-text">{status}</p>
       </div>
 
@@ -920,6 +933,10 @@ function MyKettyCatTab({ state, selectedTokenId, setSelectedTokenId, refreshStat
               <strong>{item.accessoryCount}/5</strong>
             </div>
             <RankList ranks={item.ranks} />
+            <div className="reward-line">
+              <span>Rewards</span>
+              <strong>{formatEth(item.claimableReward)} ETH</strong>
+            </div>
             <button className="primary-button secondary alt" onClick={() => setSelectedTokenId(item.id)}>
               <GalleryVerticalEnd size={18} />
               Select Cat
