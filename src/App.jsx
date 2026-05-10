@@ -191,7 +191,7 @@ export function App() {
     if (!account || !hasContracts || !window.ethereum) return undefined;
 
     refreshState(account);
-    const intervalId = window.setInterval(() => refreshState(account), 6000);
+    const intervalId = window.setInterval(() => refreshState(account), 3000);
     const handleFocus = () => refreshState(account);
     const handleVisibility = () => {
       if (document.visibilityState === "visible") refreshState(account);
@@ -350,6 +350,12 @@ export function App() {
     return marketListings;
   }
 
+  async function getTargetChainEthBalance(address) {
+    if (!address) return 0n;
+    const targetProvider = new ethers.JsonRpcProvider(targetChain.rpcUrls[0]);
+    return targetProvider.getBalance(address, "latest");
+  }
+
   async function refreshMarketListings() {
     if (!hasContracts) return;
 
@@ -398,9 +404,15 @@ export function App() {
       const walletNetwork = await walletProvider.getNetwork();
       setChainId(Number(walletNetwork.chainId));
       setNetwork(formatNetworkName(walletNetwork));
+      const targetEthBalance = await getTargetChainEthBalance(activeAccount);
       if (megaMeme.chainId && Number(walletNetwork.chainId) !== megaMeme.chainId) {
         const marketListings = await loadMarketListings();
-        setState({ ...emptyState, marketListings, lastUpdated: Date.now() });
+        setState({
+          ...emptyState,
+          ethBalance: targetEthBalance,
+          marketListings,
+          lastUpdated: Date.now()
+        });
         setStatus(`Wallet is on chain ${walletNetwork.chainId}. Switch to ${targetChain.chainName} to sync KETTY live state.`);
         return;
       }
@@ -408,7 +420,7 @@ export function App() {
       const launchpad = new ethers.Contract(megaMeme.launchpad.address, megaMeme.launchpad.abi, walletProvider);
       const token = new ethers.Contract(megaMeme.token.address, megaMeme.token.abi, walletProvider);
       const nft = new ethers.Contract(megaMeme.nft.address, megaMeme.nft.abi, walletProvider);
-      const ethBalance = await walletProvider.getBalance(activeAccount, "latest");
+      const ethBalance = targetEthBalance;
       const [tokenBalance, primaryNftId] = await launchpad.userState(activeAccount, { blockTag: "latest" });
       const ownedNftIds = await nft.tokensOfOwner(activeAccount);
       const activeTokenId = selectedTokenId && ownedNftIds.some((id) => id.toString() === selectedTokenId)
@@ -491,7 +503,7 @@ export function App() {
     const amount = Math.max(1, Math.floor(Number(amountOverride || buyAmount || 0)));
     const cost = BigInt(amount) * pricePerTokenWei;
     if (state.ethBalance > 0n && state.ethBalance < cost) {
-      setStatus(`This buy needs ${ethers.formatEther(cost)} Sepolia ETH plus gas. Connected wallet only has ${formatEth(state.ethBalance)} ETH.`);
+      setStatus(`This buy needs ${ethers.formatEther(cost)} ETH plus gas. Connected wallet only has ${formatEth(state.ethBalance)} ETH.`);
       return;
     }
 
@@ -529,7 +541,7 @@ export function App() {
         return;
       }
       if (freshEthBalance === 0n) {
-        setStatus("You have 10+ KETTY, but this transaction still needs a little Sepolia ETH for gas.");
+        setStatus("You have 10+ KETTY, but this transaction still needs a little ETH for gas.");
         return;
       }
 
@@ -563,7 +575,7 @@ export function App() {
         return;
       }
       if (freshEthBalance === 0n) {
-        setStatus("You have enough KETTY, but this transaction still needs a little Sepolia ETH for gas.");
+        setStatus("You have enough KETTY, but this transaction still needs a little ETH for gas.");
         return;
       }
 
@@ -1213,15 +1225,12 @@ function LiveState({ state, account, network, chainId }) {
         <Metric label="Network" value={chainId ? `${network || targetChain.chainName} (${chainId})` : targetChain.chainName} />
         <Metric label="KETTY contract" value={shortAddress(megaMeme.token.address)} />
         <Metric label="Wallet balance" value={`${formatToken(state.tokenBalance)} KETTY`} />
-        <Metric label="Sepolia ETH" value={`${formatEth(state.ethBalance)} ETH`} />
+        <Metric label="ETH" value={`${formatEth(state.ethBalance)} ETH`} />
         <Metric label="NFT id" value={state.nftActive ? `#${state.nftId}` : "None"} />
         <Metric label="NFTs owned" value={String(state.ownedNfts.length)} />
         <Metric label="KETTY used" value={`${formatToken(state.nftPower)} KETTY`} />
         <Metric label="Accessories" value={`${state.accessoryCount.toString()} / 5`} />
         <Metric label="Sale left" value={`${formatToken(state.remainingForSale)} KETTY`} />
-        <Metric label="LP ETH seed" value={`${formatEth(state.liquidityEthSeeded)} ETH`} />
-        <Metric label="LP KETTY seed" value={`${formatToken(state.liquidityTokenSeeded)} KETTY`} />
-        <Metric label="DEV collected" value={`${formatEth(state.devEthCollected)} ETH`} />
         <Metric label="Holder tax pool" value={`${formatEth(state.taxEthToHolders)} ETH`} />
         <Metric label="Dynamic minted" value={`${state.dynamicMinted.toString()} / 50`} />
         <Metric label="Dynamic left" value={state.dynamicRemaining.toString()} />
