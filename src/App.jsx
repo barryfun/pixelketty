@@ -188,6 +188,12 @@ export function App() {
     };
   }, [account, hasContracts, selectedTokenId]);
 
+  useEffect(() => {
+    if (activeTab === "market" && account && hasContracts && window.ethereum) {
+      refreshState(account);
+    }
+  }, [activeTab, account, hasContracts]);
+
   async function getContracts() {
     if (!window.ethereum) throw new Error("Install MetaMask or another EIP-1193 wallet first.");
     if (!hasContracts) throw new Error("Run a deploy script first so the frontend has contract addresses.");
@@ -351,13 +357,17 @@ export function App() {
         const key = id.toString();
         if (seen.has(key)) continue;
         seen.add(key);
-        const listing = await launchpad.listings(id);
-        if (!listing.active) continue;
-        marketListings.push(await readNftCard(nft, id, {
-          seller: listing.seller,
-          price: listing.price,
-          priceEth: ethers.formatEther(listing.price)
-        }));
+        try {
+          const listing = await launchpad.listings(id);
+          if (!listing.active) continue;
+          marketListings.push(await readNftCard(nft, id, {
+            seller: listing.seller,
+            price: listing.price,
+            priceEth: ethers.formatEther(listing.price)
+          }));
+        } catch (error) {
+          console.warn(`Skipped stale market listing ${key}`, error);
+        }
       }
 
       setSelectedTokenId(nftActive ? nftId.toString() : "");
@@ -716,6 +726,7 @@ export function App() {
           listSelectedNft={listSelectedNft}
           cancelListing={cancelListing}
           buyListedNft={buyListedNft}
+          refreshState={() => refreshState()}
           busyAction={busyAction}
         />
       )}
@@ -948,7 +959,7 @@ function MyKettyCatTab({ state, selectedTokenId, setSelectedTokenId, claimTaxRew
   );
 }
 
-function MarketTab({ account, state, selectedTokenId, setSelectedTokenId, listingPrice, setListingPrice, listSelectedNft, cancelListing, buyListedNft, busyAction }) {
+function MarketTab({ account, state, selectedTokenId, setSelectedTokenId, listingPrice, setListingPrice, listSelectedNft, cancelListing, buyListedNft, refreshState, busyAction }) {
   const publicListings = state.marketListings.filter((item) => !account || item.listing.seller.toLowerCase() !== account.toLowerCase());
   const ownListings = state.marketListings.filter((item) => account && item.listing.seller.toLowerCase() === account.toLowerCase());
 
@@ -979,7 +990,12 @@ function MarketTab({ account, state, selectedTokenId, setSelectedTokenId, listin
             <p className="section-kicker">Public listings</p>
             <h2>Listed by other holders</h2>
           </div>
-          <strong>{publicListings.length} live</strong>
+          <div className="market-head-actions">
+            <strong>{publicListings.length} live</strong>
+            <button className="icon-button" onClick={refreshState} aria-label="Refresh market" title="Refresh market">
+              <RefreshCw size={18} />
+            </button>
+          </div>
         </div>
 
         <div className="market-grid">
