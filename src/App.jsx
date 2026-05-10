@@ -49,6 +49,7 @@ const configuredDexScreenerUrl = (import.meta.env.VITE_DEXSCREENER_URL || "").tr
 const dexScreenerFallbackUrl = "https://dexscreener.com/ethereum";
 const targetChain = chains[megaMeme.chainId] || chains[31337];
 const svgToImage = (svg) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+const fallbackMarketImage = svgToImage(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="crispEdges"><rect width="512" height="512" fill="#202624"/><rect x="116" y="190" width="280" height="190" fill="#c9d0cd" stroke="#0d1010" stroke-width="16"/><rect x="148" y="134" width="76" height="88" fill="#bfc7c4" stroke="#0d1010" stroke-width="14"/><rect x="288" y="134" width="76" height="88" fill="#bfc7c4" stroke="#0d1010" stroke-width="14"/><rect x="188" y="244" width="136" height="118" fill="#f0e3d2"/><rect x="184" y="244" width="28" height="48" fill="#0d1010"/><rect x="300" y="244" width="28" height="48" fill="#0d1010"/><rect x="244" y="292" width="24" height="22" fill="#0d1010"/><rect x="214" y="322" width="84" height="18" fill="#0d1010"/><text x="34" y="52" fill="#fff" font-family="monospace" font-size="22" font-weight="900">KETTY LISTING</text><text x="34" y="456" fill="#fff" font-family="monospace" font-size="18" font-weight="900">METADATA LOADING</text></svg>`);
 
 const showcaseCats = [
   {
@@ -129,6 +130,7 @@ export function App() {
   const [listingPrice, setListingPrice] = useState("0.05");
   const [status, setStatus] = useState("Connect wallet and deploy the local launchpad to start testing.");
   const [busyAction, setBusyAction] = useState("");
+  const [marketStatus, setMarketStatus] = useState("Market syncing...");
   const [state, setState] = useState(emptyState);
 
   const hasContracts = Boolean(megaMeme.launchpad.address && megaMeme.launchpad.abi.length);
@@ -288,11 +290,29 @@ export function App() {
       try {
         const listing = await launchpad.listings(id);
         if (!listing.active) continue;
-        marketListings.push(await readNftCard(nft, id, {
+        const listingData = {
           seller: listing.seller,
           price: listing.price,
           priceEth: ethers.formatEther(listing.price)
-        }));
+        };
+
+        try {
+          marketListings.push(await readNftCard(nft, id, listingData));
+        } catch (metadataError) {
+          console.warn(`Market listing ${key} metadata failed`, metadataError);
+          marketListings.push({
+            id: key,
+            name: `KETTY Cat #${key}`,
+            image: fallbackMarketImage,
+            traits: [],
+            accessoryCount: 0,
+            claimableReward: 0n,
+            isDynamic: false,
+            dynamicBackground: "Static",
+            ranks: [],
+            listing: listingData
+          });
+        }
       } catch (error) {
         console.warn(`Skipped stale market listing ${key}`, error);
       }
@@ -305,14 +325,18 @@ export function App() {
     if (!hasContracts) return;
 
     try {
+      setMarketStatus("Market syncing...");
       const marketListings = await loadMarketListings();
       setState((currentState) => ({
         ...currentState,
         marketListings,
         lastUpdated: Date.now()
       }));
+      setMarketStatus(`Market synced: ${marketListings.length} active listing${marketListings.length === 1 ? "" : "s"}.`);
     } catch (error) {
-      setStatus(error.shortMessage || error.message || "Market refresh failed.");
+      const message = error.shortMessage || error.message || "Market refresh failed.";
+      setMarketStatus(message);
+      setStatus(message);
     }
   }
 
@@ -761,6 +785,7 @@ export function App() {
           cancelListing={cancelListing}
           buyListedNft={buyListedNft}
           refreshState={() => refreshState()}
+          marketStatus={marketStatus}
           busyAction={busyAction}
         />
       )}
@@ -993,7 +1018,7 @@ function MyKettyCatTab({ state, selectedTokenId, setSelectedTokenId, claimTaxRew
   );
 }
 
-function MarketTab({ account, state, selectedTokenId, setSelectedTokenId, listingPrice, setListingPrice, listSelectedNft, cancelListing, buyListedNft, refreshState, busyAction }) {
+function MarketTab({ account, state, selectedTokenId, setSelectedTokenId, listingPrice, setListingPrice, listSelectedNft, cancelListing, buyListedNft, refreshState, marketStatus, busyAction }) {
   const activeListings = state.marketListings;
   const normalizedAccount = account?.toLowerCase() || "";
 
@@ -1034,7 +1059,10 @@ function MarketTab({ account, state, selectedTokenId, setSelectedTokenId, listin
 
         <div className="market-grid">
           {activeListings.length === 0 ? (
-            <div className="empty-market">No KETTY cats are listed yet.</div>
+            <div className="empty-market">
+              No KETTY cats are listed yet.
+              <span>{marketStatus}</span>
+            </div>
           ) : activeListings.map((item) => {
             const isOwnListing = normalizedAccount && item.listing.seller.toLowerCase() === normalizedAccount;
             return (
@@ -1048,6 +1076,7 @@ function MarketTab({ account, state, selectedTokenId, setSelectedTokenId, listin
             />
           ); })}
         </div>
+        {activeListings.length > 0 && <p className="status-text market-status">{marketStatus}</p>}
       </div>
     </section>
   );
