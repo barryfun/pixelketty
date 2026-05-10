@@ -750,7 +750,7 @@ export function App() {
           <RuleCard
             step="01"
             title="Buy KETTY"
-            text="During launch, KETTY can be bought from the contract at 0.0005 ETH each. Contract sell-back is disabled; trading opens after DEV adds pool liquidity."
+            text="During launch, KETTY can be bought from the contract at 0.0005 ETH each. Trading opens after DEV adds pool liquidity."
           />
           <RuleCard
             step="02"
