@@ -33,14 +33,16 @@ const chains = {
   }
 };
 
-const pricePerToken = 0.001;
-const pricePerTokenWei = ethers.parseEther("0.001");
+const pricePerToken = 0.0005;
+const sellRefundRate = 0.7;
+const pricePerTokenWei = ethers.parseEther("0.0005");
 const nftCostWei = ethers.parseEther("10");
 const dynamicPreviewCostWei = ethers.parseEther("60");
 const saleSupplyWei = ethers.parseEther("50000");
 const shortAddress = (address) => `${address.slice(0, 6)}...${address.slice(-4)}`;
 const formatToken = (value) => Number(ethers.formatEther(value || 0n)).toLocaleString(undefined, { maximumFractionDigits: 4 });
 const formatEth = (value) => Number(ethers.formatEther(value || 0n)).toLocaleString(undefined, { maximumFractionDigits: 5 });
+const formatEthQuote = (value) => Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: 6 });
 const decodeTokenUri = (uri) => JSON.parse(atob(uri.replace("data:application/json;base64,", "")));
 const accessoryTraits = ["Crown Rank", "Earrings Rank", "Visor Rank", "Star Rank", "Collar Rank"];
 const configuredDexScreenerUrl = (import.meta.env.VITE_DEXSCREENER_URL || "").trim();
@@ -130,9 +132,12 @@ export function App() {
   const [state, setState] = useState(emptyState);
 
   const hasContracts = Boolean(megaMeme.launchpad.address && megaMeme.launchpad.abi.length);
-  const buyCost = useMemo(() => (Number(buyAmount || 0) * pricePerToken).toFixed(3), [buyAmount]);
-  const sellReturn = useMemo(() => (Number(sellAmount || 0) * pricePerToken).toFixed(3), [sellAmount]);
-  const swapQuote = useMemo(() => (Number(swapAmount || 0) * pricePerToken).toFixed(3), [swapAmount]);
+  const buyCost = useMemo(() => formatEthQuote(Number(buyAmount || 0) * pricePerToken), [buyAmount]);
+  const sellReturn = useMemo(() => formatEthQuote(Number(sellAmount || 0) * pricePerToken * sellRefundRate), [sellAmount]);
+  const swapQuote = useMemo(() => {
+    const gross = Number(swapAmount || 0) * pricePerToken;
+    return formatEthQuote(swapMode === "sell" ? gross * sellRefundRate : gross);
+  }, [swapAmount, swapMode]);
   const sellWei = useMemo(() => ethers.parseEther(String(Math.max(0, Number(sellAmount || 0)))), [sellAmount]);
   const swapSellWei = useMemo(() => ethers.parseEther(String(Math.max(0, Number(swapAmount || 0)))), [swapAmount]);
   const needsApproval = state.allowance < sellWei;
@@ -392,7 +397,7 @@ export function App() {
     }
 
     setBusyAction("buy");
-    setStatus("Confirm buy transaction. KETTY costs 0.001 ETH each.");
+    setStatus("Confirm buy transaction. KETTY costs 0.0005 ETH each.");
 
     try {
       const { launchpad } = await getContracts();
@@ -838,7 +843,7 @@ function TradeTab({ state, swapMode, setSwapMode, swapAmount, setSwapAmount, swa
           </div>
         )}
         <div className="dex-metrics">
-          <Metric label="Price" value="0.001 ETH" />
+          <Metric label="Price" value="0.0005 ETH" />
           <Metric label="Supply" value="70,000 KETTY" />
           <Metric label="For sale" value={`${formatToken(state.remainingForSale)} KETTY`} />
           <Metric label="LP reserve" value="20,000 KETTY" />

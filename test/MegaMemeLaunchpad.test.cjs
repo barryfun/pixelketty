@@ -17,7 +17,7 @@ describe("MegaMemeLaunchpad", function () {
 
     expect(await token.totalSupply()).to.equal(ethers.parseEther("70000"));
     expect(await launchpad.remainingForSale()).to.equal(ethers.parseEther("50000"));
-    expect(await launchpad.quoteBuy(25)).to.equal(ethers.parseEther("0.025"));
+    expect(await launchpad.quoteBuy(25)).to.equal(ethers.parseEther("0.0125"));
 
     await launchpad.connect(alice).buy(25, { value: await launchpad.quoteBuy(25) });
     expect(await token.balanceOf(alice.address)).to.equal(ethers.parseEther("25"));
@@ -97,16 +97,39 @@ describe("MegaMemeLaunchpad", function () {
     await expect(launchpad.connect(alice).buy(100, { value: await launchpad.quoteBuy(100) }))
       .to.changeEtherBalances(
         [alice, owner, launchpad],
-        [ethers.parseEther("-0.1"), ethers.parseEther("0.03"), ethers.parseEther("0.07")]
+        [ethers.parseEther("-0.05"), ethers.parseEther("0.015"), ethers.parseEther("0.035")]
       );
 
     expect(await token.balanceOf(alice.address)).to.equal(ethers.parseEther("100"));
-    expect(await launchpad.devEthCollected()).to.equal(ethers.parseEther("0.03"));
-    expect(await launchpad.quoteSell(100)).to.equal(ethers.parseEther("0.07"));
+    expect(await launchpad.devEthCollected()).to.equal(ethers.parseEther("0.015"));
+    expect(await launchpad.quoteSell(100)).to.equal(ethers.parseEther("0.035"));
 
     await token.connect(alice).approve(launchpadAddress, ethers.parseEther("100"));
     await expect(launchpad.connect(alice).sell(100))
-      .to.changeEtherBalances([alice, launchpad], [ethers.parseEther("0.07"), ethers.parseEther("-0.07")]);
+      .to.changeEtherBalances([alice, launchpad], [ethers.parseEther("0.035"), ethers.parseEther("-0.035")]);
+  });
+
+  it("lets only the dev withdraw surplus ETH that is not reserved for sells or holder rewards", async function () {
+    const { launchpad, alice, bob } = await deployLaunchpad();
+    const launchpadAddress = await launchpad.getAddress();
+
+    await launchpad.connect(alice).buy(20, { value: await launchpad.quoteBuy(20) });
+    expect(await ethers.provider.getBalance(launchpadAddress)).to.equal(ethers.parseEther("0.007"));
+    expect(await launchpad.sellRefundReserve()).to.equal(ethers.parseEther("0.007"));
+    expect(await launchpad.withdrawableDevEth()).to.equal(0);
+
+    await expect(launchpad.devWithdrawEth(1)).to.be.revertedWith("exceeds withdrawable");
+    await launchpad.connect(alice).mintKettyNft();
+
+    expect(await launchpad.sellRefundReserve()).to.equal(ethers.parseEther("0.0035"));
+    expect(await launchpad.withdrawableDevEth()).to.equal(ethers.parseEther("0.0035"));
+    await expect(launchpad.connect(bob).devWithdrawEth(ethers.parseEther("0.0035"))).to.be.revertedWith("not dev");
+    await expect(launchpad.devWithdrawEth(ethers.parseEther("0.0035")))
+      .to.emit(launchpad, "DevWithdrawal")
+      .withArgs(await launchpad.devWallet(), ethers.parseEther("0.0035"));
+
+    expect(await ethers.provider.getBalance(launchpadAddress)).to.equal(ethers.parseEther("0.0035"));
+    expect(await launchpad.withdrawableDevEth()).to.equal(0);
   });
 
   it("seeds the mock v4 liquidity bucket after all 50,000 sale KETTY are sold", async function () {
@@ -115,14 +138,14 @@ describe("MegaMemeLaunchpad", function () {
     await expect(launchpad.connect(alice).buy(50000, { value: await launchpad.quoteBuy(50000) }))
       .to.changeEtherBalances(
         [alice, owner, launchpad],
-        [ethers.parseEther("-50"), ethers.parseEther("15"), ethers.parseEther("35")]
+        [ethers.parseEther("-25"), ethers.parseEther("7.5"), ethers.parseEther("17.5")]
       );
 
     expect(await launchpad.remainingForSale()).to.equal(0);
     expect(await launchpad.liquiditySeeded()).to.equal(true);
-    expect(await launchpad.liquidityEthSeeded()).to.equal(ethers.parseEther("35"));
+    expect(await launchpad.liquidityEthSeeded()).to.equal(ethers.parseEther("17.5"));
     expect(await launchpad.liquidityTokenSeeded()).to.equal(ethers.parseEther("20000"));
-    expect(await hook.liquidityEthSeeded()).to.equal(ethers.parseEther("35"));
+    expect(await hook.liquidityEthSeeded()).to.equal(ethers.parseEther("17.5"));
     expect(await hook.liquidityTokenSeeded()).to.equal(ethers.parseEther("20000"));
     expect(await token.balanceOf(await launchpad.getAddress())).to.equal(ethers.parseEther("20000"));
   });

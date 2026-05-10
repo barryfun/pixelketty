@@ -7,7 +7,7 @@ contract MemeLaunchpadDemo {
     uint256 public constant SALE_SUPPLY = 50_000 ether;
     uint256 public constant LIQUIDITY_SUPPLY = 20_000 ether;
     uint256 public constant MAX_SUPPLY = SALE_SUPPLY + LIQUIDITY_SUPPLY;
-    uint256 public constant PRICE_PER_TOKEN = 0.001 ether;
+    uint256 public constant PRICE_PER_TOKEN = 0.0005 ether;
     uint256 public constant DEV_BUY_BPS = 3_000;
     uint256 public constant SELL_REFUND_BPS = 7_000;
     uint256 public constant TRADE_TAX_BPS = 300;
@@ -33,6 +33,7 @@ contract MemeLaunchpadDemo {
     uint256 public soldFromLaunchpad;
     uint256 public taxEthToDev;
     uint256 public taxEthToHolders;
+    uint256 public taxEthClaimed;
     bool public liquiditySeeded;
     uint256[] private _marketTokenIds;
     mapping(uint256 => Listing) public listings;
@@ -41,6 +42,7 @@ contract MemeLaunchpadDemo {
     event Buy(address indexed user, uint256 tokenAmount, uint256 ethPaid);
     event Sell(address indexed user, uint256 tokenAmount, uint256 ethReceived);
     event DevFeePaid(address indexed devWallet, uint256 amount);
+    event DevWithdrawal(address indexed devWallet, uint256 amount);
     event LiquiditySeeded(uint256 ethAmount);
     event PoolTaxRecorded(uint256 grossEthAmount, uint256 taxAmount, uint256 devShare, uint256 holderShare);
     event TaxRewardClaimed(address indexed user, uint256 indexed tokenId, uint256 amount);
@@ -59,6 +61,11 @@ contract MemeLaunchpadDemo {
 
         token.setHook(address(hook));
         nft.setHook(address(hook));
+    }
+
+    modifier onlyDev() {
+        require(msg.sender == devWallet, "not dev");
+        _;
     }
 
     function buy(uint256 wholeTokens) external payable {
@@ -204,10 +211,20 @@ contract MemeLaunchpadDemo {
         require(reward > 0, "nothing to claim");
 
         taxClaimedByToken[tokenId] += reward;
+        taxEthClaimed += reward;
         (bool sent, ) = payable(msg.sender).call{value: reward}("");
         require(sent, "ETH send failed");
 
         emit TaxRewardClaimed(msg.sender, tokenId, reward);
+    }
+
+    function devWithdrawEth(uint256 amount) external onlyDev {
+        require(amount > 0, "bad amount");
+        require(amount <= withdrawableDevEth(), "exceeds withdrawable");
+
+        (bool sent, ) = payable(devWallet).call{value: amount}("");
+        require(sent, "DEV withdraw failed");
+        emit DevWithdrawal(devWallet, amount);
     }
 
     function quoteBuy(uint256 wholeTokens) public pure returns (uint256) {
@@ -233,6 +250,26 @@ contract MemeLaunchpadDemo {
         uint256 claimed = taxClaimedByToken[tokenId];
         if (entitlement <= claimed) return 0;
         return entitlement - claimed;
+    }
+
+    function pendingHolderTax() public view returns (uint256) {
+        if (taxEthToHolders <= taxEthClaimed) return 0;
+        return taxEthToHolders - taxEthClaimed;
+    }
+
+    function sellRefundReserve() public view returns (uint256) {
+        uint256 contractTokenBalance = token.balanceOf(address(this));
+        if (contractTokenBalance >= MAX_SUPPLY) return 0;
+
+        uint256 sellableTokenAmount = MAX_SUPPLY - contractTokenBalance;
+        return quoteSell(sellableTokenAmount / TOKEN_UNIT);
+    }
+
+    function withdrawableDevEth() public view returns (uint256) {
+        uint256 reservedEth = sellRefundReserve() + pendingHolderTax();
+        uint256 balance = address(this).balance;
+        if (balance <= reservedEth) return 0;
+        return balance - reservedEth;
     }
 
     function remainingForSale() external view returns (uint256) {
